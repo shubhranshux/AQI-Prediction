@@ -1,0 +1,170 @@
+
+============================================================
+  AQI PREDICTION SYSTEM - Odisha
+  Powered by XGBoost Machine Learning
+============================================================
+  ✅ Model loaded successfully!
+
+============================================================
+  AQI PREDICTION - Interactive Mode
+============================================================
+  Flow: District → Location → Parameters → Prediction
+  Type 'quit' or 'q' at any prompt to exit.
+
+------------------------------------------------------------
+
+  ┌─ STEP 1: Select District
+  │
+  │   1. Cuttack         (1 locations)
+  │   2. Dhenkanal       (18 locations)
+  │   3. Ganjam          (1 locations)
+  │   4. Jajpur          (18 locations)
+  │   5. Kalahandi       (109 locations)
+  │   6. Keonjhar        (18 locations)
+  │   7. Khordha         (18 locations)
+  │   8. Sambalpur       (1 locations)
+  │   9. Sundargarh      (1 locations)
+  │
+  └─ Enter district number (or name): 
+  ┌─ STEP 2: Select Location in Kalahandi
+  │
+  │   1. Adri
+  │   2. Amathola
+  │   3. Ampani
+  │   4. Arebeda
+  │   5. Badakara
+  │   6. Balanpada
+  │   7. Baldhimal
+  │   8. Barabandha
+  │   9. Behera
+  │  10. Belkhandi
+  │  11. Bhawanipatna
+  │  12. Bhimkela
+  │  13. Bhursha
+  │  14. Biswanathpur
+  │  15. Boden
+  │  16. Boria
+  │  17. Brundabahal
+  │  18. Budhipadar
+  │  19. Chancher
+  │  20. Chapria
+  │  21. Charbahal
+  │  22. Chilpa
+  │  23. Dalguma
+  │  24. Daspur
+  │  25. Deypur
+  │  26. Dhanrabhata
+  │  27. Dharmagarh
+  │  28. Duhuria
+  │  29. Gajabahapda
+  │  30. Gambhariguda
+  │  31. Ghantiguda
+  │  32. Gogula
+  │  33. Golamunda
+  │  34. Gopinathpur
+  │  35. Gotamunda
+  │  36. Gudialipadar
+  │  37. Gudigaon
+  │  38. Habaspur
+  │  39. Jaypatna
+  │  40. Jogimunda
+  │  41. Junagarh
+  │  42. Kaigam
+  │  43. Kalam
+  │  44. Kalampur
+  │  45. Kalopala
+  │  46. Kanakpur
+  │  47. Kandel
+  │  48. Kankeri
+  │  49. Kankupa
+  │  50. Kankutru
+  │  51. Karchala
+  │  52. Karlamunda
+  │  53. Karlapada
+  │  54. Kerpai
+  │  55. Kesinga
+  │  56. Khasiguda
+  │  57. Koksara
+  │  58. Kusumkhunti
+  │  59. Kusurla
+  │  60. Kutumara
+  │  61. Ladugaon
+  │  62. Lanjigarh
+  │  63. Lanjigarh Road
+  │  64. Luhura
+  │  65. Madanpur
+  │  66. Madanpur Rampur
+  │  67. Mahichala
+  │  68. Mahulpatna
+  │  69. Majhiguda
+  │  70. Maland
+  │  71. Mandinga
+  │  72. Manikera
+  │  73. Mohangiri
+  │  74. Motar
+  │  75. Mukhiguda
+  │  76. Musiguda
+  │  77. Nakrundi
+  │  78. Narayanpur
+  │  79. Narla
+  │  80. Nuagaon
+  │  81. Palam
+  │  82. Parla
+  │  83. Pastikudi
+  │  84. Pastikudi (Junagarh)
+  │  85. Phalsapada
+  │  86. Pharad
+  │  87. Podapadar
+  │  88. Pujariguda
+  │  89. Rakamal
+  │  90. Regoda
+  │  91. Risida
+  │  92. Risida (Karlamunda)
+  │  93. Rupra
+  │  94. Saganbhadi
+  │  95. Salepali
+  │  96. Sanchergaon
+  │  97. Sankrakhol
+  │  98. Santpur
+  │  99. Sialjodi
+  │  100. Siletpada
+  │  101. Sindhipadar
+  │  102. Talampadar
+  │  103. Tentulikhunti
+  │  104. Thuamul Rampur
+  │  105. Tulapada
+  │  106. Tundla
+  │  107. Uditnarayanpur
+  │  108. Urladani
+  │  109. Utkela
+  │
+  └─ Enter location number (or name): 
+  ┌─ STEP 3: Enter Parameters for Adri, Kalahandi
+  │
+  │  PM2.5 (µg/m³)   :   │  PM10  (µg/m³)   :   │  NO2   (ppb)     :   │  SO2   (ppb)     :   │  CO    (mg/m³)   :   │  O3    (ppb)     :   │  Temperature (°C):   │  Humidity (%)    :   │  Month (1-12)    :   │  Year (e.g. 2025):   │
+  └─ PREDICTION RESULT
+
+============================================================
+  📍 District  : Kalahandi
+  📍 Location  : Adri
+  📅 Period    : 3/2025
+  🌡️  AQI      : 23
+  🟢 Category : Good
+============================================================
+------------------------------------------------------------
+
+  ┌─ STEP 1: Select District
+  │
+  │   1. Cuttack         (1 locations)
+  │   2. Dhenkanal       (18 locations)
+  │   3. Ganjam          (1 locations)
+  │   4. Jajpur          (18 locations)
+  │   5. Kalahandi       (109 locations)
+  │   6. Keonjhar        (18 locations)
+  │   7. Khordha         (18 locations)
+  │   8. Sambalpur       (1 locations)
+  │   9. Sundargarh      (1 locations)
+  │
+  └─ Enter district number (or name): 
+  Thank you for using AQI Prediction System!
+============================================================
