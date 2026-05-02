@@ -163,7 +163,7 @@ export default function App(){
                 <div style={{fontSize:20,fontWeight:900,color:s.c,lineHeight:1,letterSpacing:'-0.02em'}}>{s.v}</div>
                 <div style={{fontSize:9,color:D?'#a09888':'#9ca3af',fontWeight:700,marginTop:4,letterSpacing:'.06em',textTransform:'uppercase'}}>{s.l}</div>
               </div>
-              {i<2&&<div style={{width:1,height:28,background:D?'rgba(255,255,255,.08)':'rgba(0,0,0,.08)'}}/>}
+              {i<2&&<div className="stat-divider" style={{width:1,height:28,background:D?'rgba(255,255,255,.08)':'rgba(0,0,0,.08)'}}/>}
             </div>
           ))}
         </div>
@@ -298,7 +298,7 @@ export default function App(){
         <div className="gsap-stagger-section tech-team-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:20}}>
           <div className="hover-lift" style={{...CS,padding:24}}>
             <div style={LB}>Tech Stack</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+            <div className="tech-stack-inner-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
               {[
                 {n:'XGBoost',d:'ML Engine',c:'#d4a574'},{n:'FastAPI',d:'REST Backend',c:'#059669'},
                 {n:'React',d:'Frontend UI',c:'#61dafb'},{n:'Vite',d:'Build Tool',c:'#a855f7'},
@@ -317,7 +317,7 @@ export default function App(){
           </div>
           <div className="hover-lift" style={{...CS,padding:24}}>
             <div style={LB}>Team</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+            <div className="team-inner-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
               {[{n:'Shubhranshu Behera',r:'ML & Backend',c:'#d4a574'},{n:'Rupak Ranjan Parida',r:'Data Analysis',c:'#3b82f6'},{n:'Ranjan Kumar Nayak',r:'Research',c:'#22c55e'},{n:'Pramod Kumar Mohananta',r:'Frontend',c:'#a855f7'}].map(m=>(
                 <div key={m.n} className="hover-scale" style={{background:D?'#1a1a18':T.inp,borderRadius:14,padding:16,textAlign:'center',border:`1px solid ${T.cb}`}}>
                   <div style={{width:44,height:44,borderRadius:'50%',background:`linear-gradient(135deg, ${m.c}, ${m.c}88)`,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 10px',boxShadow:`0 4px 12px ${m.c}33`}}><Users size={18} color="#fff"/></div>

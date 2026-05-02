@@ -21,77 +21,9 @@ html { scrollbar-width:thin; scrollbar-color:rgba(120,120,120,.25) transparent; 
   background-size: cover;
 }
 
-/* ── RESPONSIVE DESIGN (Tablets & Mobile) ── */
-@media (max-width: 1280px) {
-  .dashboard-grid {
-    grid-template-columns: 280px 1fr !important; /* Stack the gauge under the pollutant breakdown */
-  }
-  .dashboard-grid > div:nth-child(3) {
-    grid-column: span 2;
-  }
-}
-
-@media (max-width: 968px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr !important;
-  }
-  .dashboard-grid > div:nth-child(3) {
-    grid-column: span 1;
-  }
-  .hero-title {
-    font-size: 44px !important;
-  }
-  .scan-section {
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-  }
-  .stats-bar {
-    width: 90% !important;
-    padding: 10px 16px !important;
-  }
-  .stats-bar > div {
-    padding: 0 12px !important;
-  }
-  .pollutant-grid {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-@media (max-width: 640px) {
-  .hero-title {
-    font-size: 34px !important;
-  }
-  .hero-sub p {
-    font-size: 13px !important;
-  }
-  .hero-buttons {
-    flex-direction: column;
-    width: 100%;
-  }
-  .hero-buttons button {
-    width: 100%;
-    justify-content: center;
-  }
-  .stats-bar {
-    flex-wrap: wrap;
-    justify-content: center;
-    border-radius: 12px !important;
-    margin-top: -40px !important;
-  }
-  .stats-bar > div:nth-child(2) > div:last-child {
-    display: none; /* Hide second divider on mobile so it wraps nicely */
-  }
-  .clock-wrapper {
-    display: none !important;
-  }
-  .hero-text-block {
-    top: 55% !important; /* Move down slightly to avoid nav overlap */
-  }
-}
-
 /* ── DESKTOP DEFAULT GRID ── */
 .dashboard-grid {
-  grid-template-columns: 300px 1fr 320px;
+  grid-template-columns: 320px 1fr 320px;
 }
 
 /* Animations */
@@ -136,133 +68,190 @@ html { scrollbar-width:thin; scrollbar-color:rgba(120,120,120,.25) transparent; 
 /* Selection */
 ::selection { background:rgba(184,134,11,.15); }
 
-/* ─── RESPONSIVE: Tablet (≤1024px) ─────────────────────────────────── */
+/* ── HYPER RESPONSIVE DESIGN ── */
+
+/* ── Laptops and smaller desktops (max-width: 1280px) ── */
+@media (max-width: 1280px) {
+  .dashboard-grid {
+    grid-template-columns: 300px 1fr !important;
+  }
+  .dashboard-grid > div:nth-child(3) {
+    grid-column: span 2;
+  }
+}
+
+/* ── Tablets (max-width: 1024px) ── */
 @media (max-width: 1024px) {
   .dashboard-grid {
     grid-template-columns: 1fr 1fr !important;
   }
-  .dashboard-grid > :first-child {
-    grid-column: 1 / -1;
+  .dashboard-grid > div:first-child {
+    grid-column: 1 / -1; /* Scan controls take full width */
+  }
+  .dashboard-grid > div:nth-child(3) {
+    grid-column: span 1; /* Reset to 1 col */
   }
   .features-grid {
     grid-template-columns: repeat(2, 1fr) !important;
   }
+  .health-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
   .stats-bar {
-    min-width: 320px !important;
-    padding: 18px 24px !important;
-    gap: 20px !important;
+    min-width: auto !important;
+    width: fit-content;
+    padding: 16px 24px !important;
+  }
+  .hero-landscape {
+    height: 70vh !important;
+    min-height: 500px !important;
   }
 }
 
-/* ─── RESPONSIVE: Mobile (≤768px) ──────────────────────────────────── */
+/* ── Small Tablets / Large Mobile (max-width: 768px) ── */
 @media (max-width: 768px) {
+  .hero-title {
+    font-size: 40px !important;
+  }
+  .hero-sub {
+    font-size: 14px !important;
+  }
   .dashboard-grid {
     grid-template-columns: 1fr !important;
   }
-
-  /* Hero landscape — shorter on mobile */
-  .hero-landscape {
-    height: 65vh !important;
-    min-height: 420px !important;
+  .dashboard-grid > div {
+    grid-column: 1 / -1 !important;
   }
-
-  /* Hero text — reposition below nav with safe spacing */
-  .hero-text-block {
-    bottom: auto !important;
-    top: 72px !important;
-    left: 20px !important;
-    right: 20px !important;
-    max-width: 100% !important;
-  }
-  .hero-title {
-    font-size: 32px !important;
-    margin-bottom: 10px !important;
-  }
-  .hero-title h1 {
-    font-size: 32px !important;
-  }
-
-  /* Hero sub elements — smaller on mobile */
-  .hero-sub {
-    font-size: 13px !important;
-  }
-
-  /* Hide the windmill on mobile — it overlaps with text */
-  .wm-wrap {
-    display: none !important;
-  }
-
-  /* Sun/Moon orb — make smaller and push to corner */
-  .zen-orb {
-    width: 50px !important;
-    height: 50px !important;
-    right: 10% !important;
-    top: 8% !important;
-  }
-
-  /* Stats bar — flow below hero instead of floating */
-  .stats-bar {
-    position: relative !important;
-    bottom: auto !important;
-    right: auto !important;
-    left: 0 !important;
-    min-width: auto !important;
-    width: calc(100% - 32px) !important;
-    margin: -24px auto 0 !important;
-    padding: 16px 20px !important;
-    gap: 16px !important;
-  }
-
-  .health-grid {
-    grid-template-columns: 1fr !important;
-  }
-  .features-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
+  
   .tech-team-grid {
     grid-template-columns: 1fr !important;
   }
-  .scan-section {
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-    padding-top: 40px !important;
-  }
-  .site-footer {
-    flex-direction: column !important;
-    gap: 8px !important;
-    text-align: center !important;
-  }
-}
-
-/* ─── RESPONSIVE: Small phone (≤480px) ─────────────────────────────── */
-@media (max-width: 480px) {
-  .hero-landscape {
-    height: 55vh !important;
-    min-height: 360px !important;
-    border-radius: 16px !important;
-  }
-  .hero-text-block {
-    top: 64px !important;
-    left: 16px !important;
-    right: 16px !important;
-  }
-  .hero-title {
-    font-size: 26px !important;
-  }
-
-  .features-grid {
+  
+  .health-grid {
     grid-template-columns: 1fr !important;
   }
 
   .stats-bar {
-    grid-template-columns: 1fr 1fr 1fr !important;
-    gap: 8px !important;
-    padding: 14px 16px !important;
-  }
-  .stats-bar > div > div:first-child {
-    font-size: 20px !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    width: calc(100% - 32px) !important;
+    margin: -40px auto 0 !important;
+    padding: 16px !important;
+    border-radius: 16px !important;
   }
   .stats-bar > div > div:last-child {
-    font-size: 9px !important;
+    font-size: 10px !important;
+  }
+  
+  .hero-landscape {
+    height: 65vh !important;
+    min-height: 480px !important;
+  }
+
+  .hero-text-block {
+    top: 55% !important;
+    width: 100% !important;
+    padding: 0 16px !important;
+  }
+  
+  .scan-section {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    padding-top: 50px !important;
+  }
+  
+  .site-footer {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 12px !important;
+  }
+}
+
+/* ── Mobile (max-width: 640px) ── */
+@media (max-width: 640px) {
+  .hero-title {
+    font-size: 32px !important;
+    line-height: 1.2 !important;
+  }
+  .hero-title .hero-word {
+    display: inline-block !important;
+  }
+  .hero-sub {
+    font-size: 13px !important;
+  }
+  .hero-buttons {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 12px !important;
+  }
+  .hero-buttons button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .clock-wrapper {
+    display: none !important;
+  }
+
+  /* Make the stats dividers disappear and show stats in a row */
+  .stats-bar {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 8px !important;
+    padding: 12px 8px !important;
+  }
+  .stats-bar > div {
+    padding: 0 !important;
+    flex-direction: column !important;
+  }
+  .stat-divider {
+    display: none !important;
+  }
+  .stats-bar > div > div:first-child {
+    font-size: 18px !important;
+  }
+  .stats-bar > div > div:nth-child(2) {
+    font-size: 8px !important;
+  }
+
+  .wm-wrap {
+    display: none !important;
+  }
+  .zen-orb {
+    width: 60px !important;
+    height: 60px !important;
+    right: 15% !important;
+    top: 15% !important;
+  }
+
+  .pollutant-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .tech-stack-inner-grid, .team-inner-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .hover-lift, .hover-scale {
+    padding: 16px !important;
+  }
+}
+
+/* ── Small Mobile (max-width: 480px) ── */
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 28px !important;
+  }
+  .hero-landscape {
+    height: 60vh !important;
+    min-height: 400px !important;
+    border-radius: 16px !important;
+  }
+  .stats-bar > div > div:first-child {
+    font-size: 16px !important;
   }
 }
