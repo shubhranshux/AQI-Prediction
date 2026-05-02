@@ -25,7 +25,13 @@ class PredictionService:
         now = datetime.now()
 
         try:
-            loc_encoded = cls.le.transform([location])[0]
+            if location in cls.le.classes_:
+                loc_encoded = cls.le.transform([location])[0]
+            else:
+                # Fallback to a known location for the model encoder
+                fallback_map = {'Kalahandi': 'Bhawanipatna', 'Dhenkanal': 'Dhenkanal', 'Khordha': 'Bhubaneswar'}
+                loc_encoded = cls.le.transform([fallback_map.get(district, cls.le.classes_[0])])[0]
+                
             dist_encoded = cls.le_district.transform([district])[0]
         except Exception:
             raise HTTPException(
