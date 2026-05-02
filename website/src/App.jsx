@@ -45,9 +45,9 @@ export default function App(){
   const aqi=result?.predicted_aqi??null;const lv=aqi!==null?getLevel(aqi):null;const LI=lv?.I||Shield;
   const theme=getAqiTheme(aqi);const p=result?.parameters;
   const T=D?{bg:'#000000',card:'#111110',cb:'rgba(255,255,255,.08)',text:'#f0ece4',sub:'#a09888',mut:'#6c665d',acc:'#d4a574',inp:'#1a1a18',inpB:'rgba(255,255,255,.10)',div:'rgba(255,255,255,.06)'}
-    :{bg:'#ffffff',card:'#f5f0e8',cb:'rgba(0,0,0,.06)',text:'#1a1510',sub:'#7a6b5d',mut:'#b8a898',acc:'#b8860b',inp:'#efe9df',inpB:'rgba(0,0,0,.08)',div:'rgba(0,0,0,.06)'};
-  const CS={background:T.card,border:`1px solid ${T.cb}`,borderRadius:20,boxShadow:D?'0 2px 16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.03)':'0 2px 8px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.04)'};
-  const LB={fontSize:11,color:T.sub,letterSpacing:'.1em',textTransform:'uppercase',fontWeight:700,marginBottom:10};
+    :{bg:'#f9f9fc',card:'#ffffff',cb:'rgba(0,0,0,.04)',text:'#111827',sub:'#6b7280',mut:'#9ca3af',acc:'#0f172a',inp:'#f3f4f6',inpB:'rgba(0,0,0,.05)',div:'rgba(0,0,0,.06)'};
+  const CS={background:T.card,border:`1px solid ${T.cb}`,borderRadius:24,boxShadow:D?'0 2px 16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.03)':'0 10px 30px rgba(0,0,0,.03), 0 1px 3px rgba(0,0,0,.02)'};
+  const LB={fontSize:11,color:T.sub,letterSpacing:'.08em',textTransform:'uppercase',fontWeight:700,marginBottom:12};
   const mainRef=useRef(null);
 
   // GSAP scroll animations
@@ -100,19 +100,6 @@ export default function App(){
               <button onClick={()=>document.getElementById('features')?.scrollIntoView({behavior:'smooth'})} style={{padding:'11px 26px',borderRadius:99,border:'1px solid rgba(255,255,255,.3)',background:'rgba(255,255,255,.08)',color:'#fff',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:"'Inter'",backdropFilter:'blur(4px)'}}>Our Features</button>
             </div>
           </div>
-
-          {/* Floating Gauge Card — LEFT side */}
-          <div className="hero-gauge-float" style={{position:'absolute',top:80,left:32,zIndex:10,width:260,background:'rgba(0,0,0,.25)',backdropFilter:'blur(24px)',border:'1px solid rgba(255,255,255,.15)',borderRadius:20,padding:20,color:'#fff',boxShadow:'0 8px 32px rgba(0,0,0,.2)'}}>
-            <div style={{textAlign:'center'}}>
-              <Gauge aqi={aqi??0} color={lv?.color||'rgba(255,255,255,.3)'} dark={true}/>
-              <div style={{fontSize:44,fontWeight:900,color:lv?.color||'rgba(255,255,255,.3)',lineHeight:1,marginTop:-2}}>{aqi??'--'}</div>
-              <div style={{fontSize:9,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.5)',fontWeight:700,marginTop:6}}>Air Quality Index</div>
-            </div>
-            {lv&&<div style={{marginTop:10,paddingTop:10,borderTop:'1px solid rgba(255,255,255,.1)',display:'flex',alignItems:'center',gap:6}}>
-              <LI size={13} color={lv.color}/><span style={{fontSize:12,fontWeight:700,color:lv.color}}>{lv.label}</span>
-              <span style={{fontSize:11,color:'rgba(255,255,255,.5)',marginLeft:'auto',display:'flex',alignItems:'center',gap:3}}><MapPin size={10}/>{result?.location}</span>
-            </div>}
-          </div>
         </div>
 
         {/* Stats bar — bottom right, overlapping */}
@@ -133,7 +120,7 @@ export default function App(){
         <div className="gsap-fade dashboard-grid" style={{display:'grid',gridTemplateColumns:'300px 1fr 320px',gap:16,marginBottom:20}}>
 
           {/* COL 1: Scan Controls */}
-          <div style={{...CS,padding:22}}>
+          <div style={{...CS,padding:22,position:'relative',zIndex:20}}>
             <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}><Search size={15} color={T.acc}/><span style={{fontSize:15,fontWeight:800}}>Scan</span></div>
             <div style={{display:'flex',background:D?'#252523':'#f0ebe4',borderRadius:10,padding:3,gap:2,marginBottom:12}}>
               <button onClick={()=>setMode('auto')} style={{flex:1,padding:'8px 0',borderRadius:8,border:'none',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:"'Inter'",display:'flex',alignItems:'center',justifyContent:'center',gap:4,background:mode==='auto'?T.card:'transparent',color:mode==='auto'?T.text:T.sub,boxShadow:mode==='auto'&&!D?'0 1px 3px rgba(0,0,0,.05)':'none'}}><Radio size={11}/>Auto</button>
@@ -143,7 +130,7 @@ export default function App(){
             <SearchSelect label="Location" value={location} options={locMap[district]||[]} onChange={setLocation} placeholder="Search..." dark={D}/>
             {mode==='manual'&&<div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:5,marginBottom:10}}>{FIELDS.map(f=><div key={f.k}><div style={{fontSize:8,color:T.sub,letterSpacing:'.06em',textTransform:'uppercase',fontWeight:700,marginBottom:2}}>{f.l}</div><input type="number" step="any" placeholder="0" value={manual[f.k]} onChange={e=>setManual(p=>({...p,[f.k]:e.target.value}))} style={{width:'100%',background:T.inp,border:`1.5px solid ${T.inpB}`,borderRadius:8,padding:'6px 8px',fontSize:11,fontFamily:"'Inter'",color:T.text,outline:'none'}}/></div>)}</div>}
             {error&&<div style={{background:'rgba(239,68,68,.06)',borderRadius:8,padding:'6px 8px',marginBottom:8,fontSize:10,color:'#ef4444',display:'flex',alignItems:'center',gap:4}}><AlertCircle size={11}/>{error}</div>}
-            <button onClick={scan} disabled={loading||!districts.length} style={{width:'100%',padding:13,borderRadius:12,border:'none',background:`linear-gradient(135deg,${T.acc},#d4a574)`,color:'#fff',fontSize:14,fontWeight:800,cursor:'pointer',fontFamily:"'Inter'",opacity:loading?.5:1}}>{loading?'Scanning...':'Scan Air Quality'}</button>
+            <button onClick={scan} disabled={loading||!districts.length} style={{width:'100%',padding:14,borderRadius:14,border:'none',background:T.acc,color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:"'Inter'",opacity:loading?.5:1,transition:'all .2s',boxShadow:'0 4px 12px rgba(15,23,42,.15)'}}>{loading?'Scanning...':'Scan Air Quality'}</button>
           </div>
 
           {/* COL 2: Pollutant Breakdown */}
@@ -223,7 +210,7 @@ export default function App(){
         {/* Tech + Team */}
         <div className="gsap-fade tech-team-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:20}}>
           <div style={{...CS,padding:24}}><div style={LB}>Tech Stack</div><div style={{display:'flex',flexWrap:'wrap',gap:8}}>{['XGBoost','FastAPI','React','Vite','Tailwind','scikit-learn','Open-Meteo','Lucide'].map(t=><span key={t} style={{background:D?'#252523':T.inp,border:`1px solid ${T.cb}`,borderRadius:99,padding:'6px 14px',fontSize:12,fontWeight:600,color:T.sub}}>{t}</span>)}</div></div>
-          <div style={{...CS,padding:24}}><div style={LB}>Team</div><div style={{display:'flex',gap:10,flexWrap:'wrap'}}>{[{n:'Shubhranshu Behera',r:'ML & Backend'},{n:'Rupak Ranjan Parida',r:'Frontend'},{n:'Ranjan Kumar Nayak',r:'Research'},{n:'Pramod Kumar Mohananta',r:'Data Analysis'}].map(m=><div key={m.n} style={{flex:'1 1 120px',background:D?'#1a1a18':T.inp,borderRadius:12,padding:'14px 10px',textAlign:'center'}}><div style={{width:36,height:36,borderRadius:'50%',background:`linear-gradient(135deg,${T.acc},#d4a574)`,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 8px'}}><Users size={15} color="#fff"/></div><div style={{fontSize:12,fontWeight:800}}>{m.n}</div><div style={{fontSize:10,color:T.sub,marginTop:2}}>{m.r}</div></div>)}</div></div>
+          <div style={{...CS,padding:24}}><div style={LB}>Team</div><div style={{display:'flex',gap:10,flexWrap:'wrap'}}>{[{n:'Shubhranshu Behera',r:'ML & Backend'},{n:'Rupak Ranjan Parida',r:'Data Analysis'},{n:'Ranjan Kumar Nayak',r:'Research'},{n:'Pramod Kumar Mohananta',r:'Frontend'}].map(m=><div key={m.n} style={{flex:'1 1 120px',background:D?'#1a1a18':T.inp,borderRadius:16,padding:'16px 10px',textAlign:'center'}}><div style={{width:40,height:40,borderRadius:'50%',background:T.acc,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 12px',boxShadow:'0 4px 12px rgba(0,0,0,.1)'}}><Users size={16} color="#fff"/></div><div style={{fontSize:13,fontWeight:700,color:T.text}}>{m.n}</div><div style={{fontSize:11,color:T.sub,marginTop:4,fontWeight:500}}>{m.r}</div></div>)}</div></div>
         </div>
 
         <footer className="site-footer" style={{borderTop:`1px solid ${T.div}`,padding:'18px 0 22px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>

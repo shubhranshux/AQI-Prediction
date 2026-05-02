@@ -7,6 +7,12 @@ html, body { overflow-x:hidden; width:100%; }
 ::-webkit-scrollbar { width:0; height:0; }
 html { scrollbar-width:none; }
 
+.custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(180, 180, 180, 0.4); border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(180, 180, 180, 0.7); }
+.custom-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(180, 180, 180, 0.4) transparent; }
+
 /* Smooth transitions on theme toggle — excludes transform so animations work */
 * { transition-property: background-color, border-color, color, box-shadow; transition-duration: .25s; transition-timing-function: ease; }
 *[class*="wm-"], *[class*="hero-particle"], *[class*="hero-star"], *[class*="hero-shoot"], *[class*="ws-"] {

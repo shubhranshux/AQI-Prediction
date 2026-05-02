@@ -9,7 +9,7 @@ export default function SearchSelect({ label, value, options, onChange, placehol
   useEffect(() => { if (open && inputRef.current) inputRef.current.focus(); }, [open]);
   const filtered = options.filter(o => o.toLowerCase().includes(search.toLowerCase()));
   const T = dark ? { bg:'#222220',br:'rgba(255,255,255,.08)',brA:'#d4a574',text:'#f5f0e8',sub:'#5c564d',drop:'#1a1a19',dropBr:'rgba(255,255,255,.08)',hover:'#252523',check:'#d4a574',sel:'#d4a574' }
-    : { bg:'#f5f0e8',br:'rgba(0,0,0,.06)',brA:'#d4a574',text:'#1a1510',sub:'#b8a898',drop:'#fff',dropBr:'rgba(0,0,0,.06)',hover:'#faf6f1',check:'#d4a574',sel:'#b8860b' };
+    : { bg:'#ffffff',br:'rgba(0,0,0,.08)',brA:'#0f172a',text:'#111827',sub:'#6b7280',drop:'#ffffff',dropBr:'rgba(0,0,0,.06)',hover:'#f3f4f6',check:'#0f172a',sel:'#0f172a' };
 
   return (
     <div ref={ref} style={{ position:"relative", marginBottom:14 }}>
@@ -23,7 +23,7 @@ export default function SearchSelect({ label, value, options, onChange, placehol
           <div style={{ padding:"8px 10px", borderBottom:`1px solid ${T.dropBr}` }}>
             <input ref={inputRef} value={search} onChange={e=>setSearch(e.target.value)} placeholder={`Search...`} style={{ width:"100%", background:T.bg, border:`1.5px solid ${T.br}`, borderRadius:8, padding:"8px 12px", color:T.text, fontSize:13, fontFamily:"'DM Sans'", outline:"none" }} onFocus={e=>e.target.style.borderColor=T.brA} onBlur={e=>e.target.style.borderColor=T.br}/>
           </div>
-          <div style={{ overflowY:"auto", maxHeight:200 }}>
+          <div className="custom-scrollbar" style={{ overflowY:"auto", maxHeight:200 }}>
             {filtered.length===0 ? <div style={{padding:14,textAlign:"center",fontSize:12,color:T.sub}}>No results</div>
             : filtered.map(opt=>(
               <div key={opt} onClick={()=>{onChange(opt);setOpen(false);setSearch("")}} onMouseEnter={e=>e.currentTarget.style.background=T.hover} onMouseLeave={e=>e.currentTarget.style.background='transparent'}
