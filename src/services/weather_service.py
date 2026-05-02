@@ -49,10 +49,10 @@ class WeatherService:
 
         # Apply ML-aligned Calibration Multipliers to correct satellite underestimation
         multiplier = 1.0
-        if district in ['Cuttack', 'Khordha']: multiplier = 1.8
-        elif district == 'Jajpur': multiplier = 1.6
-        elif district == 'Keonjhar': multiplier = 2.0
-        elif district == 'Kalahandi': multiplier = 1.3
+        if district in ['Cuttack', 'Khordha']: multiplier = 2.05
+        elif district == 'Jajpur': multiplier = 1.85
+        elif district == 'Keonjhar': multiplier = 2.2
+        elif district == 'Kalahandi': multiplier = 1.4
 
         return {
             "pm25": round(pm25 * multiplier, 2),
