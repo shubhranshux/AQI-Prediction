@@ -91,8 +91,21 @@ export default function App(){
   // GSAP scroll animations
   useEffect(()=>{
     const ctx=gsap.context(()=>{
-      gsap.utils.toArray('.gsap-fade').forEach(el=>{
-        gsap.from(el,{y:40,opacity:0,duration:.8,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 85%',toggleActions:'play none none none'}});
+      // 1. Hero Text & Stats
+      gsap.from('.hero-word', { y: 80, opacity: 0, duration: 1, stagger: 0.15, ease: 'power4.out', delay: 0.1 });
+      gsap.from('.hero-sub', { y: 20, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.6 });
+      gsap.from('.stats-bar', { y: 40, opacity: 0, duration: 1.2, ease: 'elastic.out(1, 0.7)', delay: 0.8 });
+
+      // 2. Dashboard Sections Stagger
+      gsap.utils.toArray('.gsap-stagger-section').forEach(section => {
+        gsap.from(section.querySelectorAll('.hover-lift, .hover-scale, .health-card'), {
+          y: 40, 
+          opacity: 0, 
+          duration: 0.8, 
+          stagger: 0.1, 
+          ease: 'power3.out',
+          scrollTrigger: { trigger: section, start: 'top 85%' }
+        });
       });
     },mainRef);
     return()=>ctx.revert();
@@ -106,10 +119,22 @@ export default function App(){
         {/* Landscape container — full width, rounded */}
         <div className="hero-landscape" style={{position:'relative',height:'80vh',minHeight:520,borderRadius:24,overflow:'hidden',transform:'translateZ(0)',isolation:'isolate',WebkitMaskImage:'-webkit-radial-gradient(white, black)'}}>
           <HeroBackground isNight={time.isNight}/>
-
           {/* Dark overlay for text readability */}
-          <div style={{position:'absolute',inset:0,background:'linear-gradient(to top, rgba(0,0,0,.65) 0%, rgba(0,0,0,.15) 50%, rgba(0,0,0,.4) 100%)',zIndex:5}}/>
+          <div style={{position:'absolute',inset:0,background:'linear-gradient(to right, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 50%, transparent 100%)',pointerEvents:'none'}}/>
 
+          {/* Hero Content Overlay */}
+          <div className="hero-text-block" style={{position:'absolute',bottom:80,left:60,zIndex:10,maxWidth:500}}>
+            <div className="hero-sub" style={{display:'inline-flex',alignItems:'center',gap:6,background:'rgba(255,255,255,.15)',backdropFilter:'blur(10px)',padding:'6px 14px',borderRadius:99,color:'#fff',fontSize:13,fontWeight:700,letterSpacing:'.08em',marginBottom:20}}>
+              <Sparkles size={14}/> LIVE INTELLIGENCE
+            </div>
+            <h1 className="hero-title" style={{fontSize:56,fontWeight:900,color:'#fff',lineHeight:1.05,letterSpacing:'-0.03em',marginBottom:16}}>
+              <div style={{overflow:'hidden',paddingBottom:4}}><span className="hero-word" style={{display:'block'}}>Air Quality.</span></div>
+              <div style={{overflow:'hidden',paddingBottom:4}}><span className="hero-word" style={{display:'block',color:'#d4a574'}}>Redefined.</span></div>
+            </h1>
+            <p className="hero-sub" style={{fontSize:16,color:'rgba(255,255,255,.8)',lineHeight:1.6,fontWeight:400,marginBottom:32}}>Hyper-local predictions powered by XGBoost. Stay ahead of pollution with our AI-driven insights.</p>
+            <button className="hero-sub hover-scale" onClick={()=>document.getElementById('scan-section').scrollIntoView({behavior:'smooth'})} style={{background:'#d4a574',color:'#000',border:'none',padding:'14px 28px',borderRadius:12,fontSize:14,fontWeight:800,cursor:'pointer',boxShadow:'0 8px 24px rgba(212,165,116,.3)'}}>Start Scanning</button>
+          </div>
+          
           {/* Nav on top of landscape */}
           <div style={{position:'absolute',top:0,left:0,right:0,zIndex:15,padding:'20px 32px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
             <div style={{display:'flex',alignItems:'center',gap:8}}>
@@ -155,7 +180,7 @@ export default function App(){
       <div id="scan-section" className="scan-section" style={{padding:'60px 32px 0',maxWidth:'100%'}}>
 
         {/* ── 3-COLUMN LAYOUT: Scan | Pollutants | Gauge ── */}
-        <div className="gsap-fade dashboard-grid" style={{display:'grid',gridTemplateColumns:'300px 1fr 320px',gap:16,marginBottom:20}}>
+        <div className="gsap-stagger-section dashboard-grid" style={{display:'grid',gridTemplateColumns:'300px 1fr 320px',gap:16,marginBottom:20,position:'relative',zIndex:50}}>
 
           {/* COL 1: Scan Controls */}
           <div className="hover-lift" style={{...CS,padding:22,position:'relative',zIndex:20}}>
@@ -234,9 +259,9 @@ export default function App(){
         </div>
 
         {/* Health Tips */}
-        {aqi!==null&&<div className="health-grid" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:14,marginBottom:20}}>
+        {aqi!==null&&<div className="health-grid gsap-stagger-section" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:14,marginBottom:20}}>
           {[{I:Activity,t:'Outdoor Activity',tip:aqi<100?'Great for sports & jogging.':'Limit prolonged outdoor exertion.',c:'#22c55e'},{I:Shield,t:'Protection',tip:aqi<100?'No mask needed today.':'N95 mask recommended outdoors.',c:'#3b82f6'},{I:Wind,t:'Ventilation',tip:aqi<100?'Open windows for fresh air.':'Keep windows closed. Use purifiers.',c:'#eab308'}].map(h=>(
-            <div key={h.t} className="hover-lift" style={{...CS,padding:20,display:'flex',alignItems:'center',gap:14}}>
+            <div key={h.t} className="hover-lift health-card" style={{...CS,padding:20,display:'flex',alignItems:'center',gap:14}}>
               <div style={{width:40,height:40,borderRadius:12,background:`${h.c}0A`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><h.I size={18} color={h.c}/></div>
               <div><div style={{fontSize:14,fontWeight:800}}>{h.t}</div><div style={{fontSize:13,color:T.sub,lineHeight:1.5}}>{h.tip}</div></div>
             </div>
@@ -244,7 +269,7 @@ export default function App(){
         </div>}
 
         {/* Features */}
-        <div id="features" className="gsap-fade" style={{marginTop:32,marginBottom:20}}>
+        <div id="features" className="gsap-stagger-section" style={{marginTop:32,marginBottom:20}}>
           <div style={{textAlign:'center',marginBottom:24}}><div style={LB}>Why EnviroPredict</div><h2 style={{fontSize:30,fontWeight:900,margin:'4px 0'}}>Built for Precision</h2></div>
           <div className="features-grid" style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:14}}>
             {[{I:Cpu,t:'ML Powered',d:'XGBoost with 98.83% accuracy.',c:'#d4a574'},{I:Database,t:'Live Data',d:'Real-time from Open-Meteo API.',c:'#3b82f6'},{I:BarChart3,t:'6 Pollutants',d:'Complete pollutant analysis.',c:'#22c55e'},{I:Sparkles,t:'Smart UI',d:'Landscape reacts to AQI.',c:'#a855f7'}].map(f=>(
@@ -257,7 +282,7 @@ export default function App(){
         </div>
 
         {/* Tech + Team */}
-        <div className="gsap-fade tech-team-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:20}}>
+        <div className="gsap-stagger-section tech-team-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:20}}>
           <div className="hover-lift" style={{...CS,padding:24}}><div style={LB}>Tech Stack</div><div style={{display:'flex',flexWrap:'wrap',gap:8}}>{['XGBoost','FastAPI','React','Vite','Tailwind','scikit-learn','Open-Meteo','Lucide'].map(t=><span key={t} className="hover-scale" style={{background:D?'#252523':T.inp,border:`1px solid ${T.cb}`,borderRadius:99,padding:'6px 14px',fontSize:12,fontWeight:600,color:T.sub,cursor:'default',display:'inline-block'}}>{t}</span>)}</div></div>
           <div className="hover-lift" style={{...CS,padding:24}}><div style={LB}>Team</div><div style={{display:'flex',gap:10,flexWrap:'wrap'}}>{[{n:'Shubhranshu Behera',r:'ML & Backend'},{n:'Rupak Ranjan Parida',r:'Data Analysis'},{n:'Ranjan Kumar Nayak',r:'Research'},{n:'Pramod Kumar Mohananta',r:'Frontend'}].map(m=><div key={m.n} className="hover-scale" style={{flex:'1 1 120px',background:D?'#1a1a18':T.inp,borderRadius:16,padding:'16px 10px',textAlign:'center'}}><div style={{width:40,height:40,borderRadius:'50%',background:T.acc,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 12px',boxShadow:'0 4px 12px rgba(0,0,0,.1)'}}><Users size={16} color="#fff"/></div><div style={{fontSize:13,fontWeight:700,color:T.text}}>{m.n}</div><div style={{fontSize:11,color:T.sub,marginTop:4,fontWeight:500}}>{m.r}</div></div>)}</div></div>
         </div>
