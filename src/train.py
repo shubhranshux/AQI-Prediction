@@ -141,7 +141,7 @@ def print_comparison(results):
             best_model_name = name
         print(f"  {name:<22} {res['r2']:>8.4f} {res['mae']:>10.2f} {res['rmse']:>10.2f}")
 
-    print(f"\n  ★ Best Model: {best_model_name} (R² = {best_r2:.4f})")
+    print(f"\n  * Best Model: {best_model_name} (R2 = {best_r2:.4f})")
     print("=" * 60)
 
     return best_model_name

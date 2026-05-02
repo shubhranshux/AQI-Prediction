@@ -277,12 +277,12 @@ export default function App(){
 
         {/* Features */}
         <div id="features" className="gsap-stagger-section" style={{marginTop:32,marginBottom:20,position:'relative',zIndex:30}}>
-          <div style={{textAlign:'center',marginBottom:24}}><div style={LB}>Why EnviroPredict</div><h2 style={{fontSize:30,fontWeight:900,margin:'4px 0'}}>Built for Precision</h2></div>
+          <div style={{textAlign:'center',marginBottom:24}}><div style={LB}>Why EnviroPredict</div><h2 style={{fontSize:30,fontWeight:900,margin:'4px 0'}}>Built for Precision</h2><p style={{fontSize:14,color:T.sub,maxWidth:480,margin:'8px auto 0'}}>Combining cutting-edge ML models with live environmental data for the most accurate AQI predictions in Odisha.</p></div>
           <div className="features-grid" style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:14}}>
-            {[{I:Cpu,t:'ML Powered',d:'XGBoost with 98.83% accuracy.',c:'#d4a574'},{I:Database,t:'Live Data',d:'Real-time from Open-Meteo API.',c:'#3b82f6'},{I:BarChart3,t:'6 Pollutants',d:'Complete pollutant analysis.',c:'#22c55e'},{I:Sparkles,t:'Smart UI',d:'Landscape reacts to AQI.',c:'#a855f7'}].map(f=>(
+            {[{I:Cpu,t:'ML Powered',d:'XGBoost with 98.83% accuracy trained on 25,000+ data points.',c:'#d4a574'},{I:Database,t:'Live Data',d:'Real-time pollutant data from calibrated Open-Meteo API.',c:'#3b82f6'},{I:BarChart3,t:'6 Pollutants',d:'PM2.5, PM10, NO₂, SO₂, CO, O₃ analyzed simultaneously.',c:'#22c55e'},{I:Sparkles,t:'Smart UI',d:'Animated landscape reacts to AQI conditions in real-time.',c:'#a855f7'}].map(f=>(
               <div key={f.t} className="hover-lift" style={{...CS,padding:22,textAlign:'center'}}>
-                <div style={{width:44,height:44,borderRadius:12,background:`${f.c}12`,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 12px'}}><f.I size={20} color={f.c}/></div>
-                <div style={{fontSize:15,fontWeight:800,marginBottom:4}}>{f.t}</div><div style={{fontSize:13,color:T.sub,lineHeight:1.5}}>{f.d}</div>
+                <div style={{width:48,height:48,borderRadius:14,background:`${f.c}12`,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 14px',border:`1px solid ${f.c}20`}}><f.I size={22} color={f.c}/></div>
+                <div style={{fontSize:15,fontWeight:800,marginBottom:6}}>{f.t}</div><div style={{fontSize:12,color:T.sub,lineHeight:1.6}}>{f.d}</div>
               </div>
             ))}
           </div>
@@ -290,14 +290,46 @@ export default function App(){
 
         {/* Tech + Team */}
         <div className="gsap-stagger-section tech-team-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:20}}>
-          <div className="hover-lift" style={{...CS,padding:24}}><div style={LB}>Tech Stack</div><div style={{display:'flex',flexWrap:'wrap',gap:8}}>{['XGBoost','FastAPI','React','Vite','Tailwind','scikit-learn','Open-Meteo','Lucide'].map(t=><span key={t} className="hover-scale" style={{background:D?'#252523':T.inp,border:`1px solid ${T.cb}`,borderRadius:99,padding:'6px 14px',fontSize:12,fontWeight:600,color:T.sub,cursor:'default',display:'inline-block'}}>{t}</span>)}</div></div>
-          <div className="hover-lift" style={{...CS,padding:24}}><div style={LB}>Team</div><div style={{display:'flex',gap:10,flexWrap:'wrap'}}>{[{n:'Shubhranshu Behera',r:'ML & Backend'},{n:'Rupak Ranjan Parida',r:'Data Analysis'},{n:'Ranjan Kumar Nayak',r:'Research'},{n:'Pramod Kumar Mohananta',r:'Frontend'}].map(m=><div key={m.n} className="hover-scale" style={{flex:'1 1 120px',background:D?'#1a1a18':T.inp,borderRadius:16,padding:'16px 10px',textAlign:'center'}}><div style={{width:40,height:40,borderRadius:'50%',background:T.acc,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 12px',boxShadow:'0 4px 12px rgba(0,0,0,.1)'}}><Users size={16} color="#fff"/></div><div style={{fontSize:13,fontWeight:700,color:T.text}}>{m.n}</div><div style={{fontSize:11,color:T.sub,marginTop:4,fontWeight:500}}>{m.r}</div></div>)}</div></div>
+          <div className="hover-lift" style={{...CS,padding:24}}>
+            <div style={LB}>Tech Stack</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+              {[
+                {n:'XGBoost',d:'ML Engine',c:'#d4a574'},{n:'FastAPI',d:'REST Backend',c:'#059669'},
+                {n:'React',d:'Frontend UI',c:'#61dafb'},{n:'Vite',d:'Build Tool',c:'#a855f7'},
+                {n:'scikit-learn',d:'Data Pipeline',c:'#f97316'},{n:'Open-Meteo',d:'Live AQ Data',c:'#3b82f6'},
+                {n:'Tailwind',d:'CSS Framework',c:'#38bdf8'},{n:'Lucide',d:'Icon System',c:'#6b7280'}
+              ].map(t=>(
+                <div key={t.n} className="hover-scale" style={{background:D?'#1a1a18':T.inp,borderRadius:14,padding:'12px 14px',display:'flex',alignItems:'center',gap:10,border:`1px solid ${T.cb}`}}>
+                  <div style={{width:8,height:8,borderRadius:'50%',background:t.c,flexShrink:0,boxShadow:`0 0 8px ${t.c}66`}}/>
+                  <div>
+                    <div style={{fontSize:13,fontWeight:700}}>{t.n}</div>
+                    <div style={{fontSize:10,color:T.sub,fontWeight:500}}>{t.d}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="hover-lift" style={{...CS,padding:24}}>
+            <div style={LB}>Team</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+              {[{n:'Shubhranshu Behera',r:'ML & Backend',c:'#d4a574'},{n:'Rupak Ranjan Parida',r:'Data Analysis',c:'#3b82f6'},{n:'Ranjan Kumar Nayak',r:'Research',c:'#22c55e'},{n:'Pramod Kumar Mohananta',r:'Frontend',c:'#a855f7'}].map(m=>(
+                <div key={m.n} className="hover-scale" style={{background:D?'#1a1a18':T.inp,borderRadius:14,padding:16,textAlign:'center',border:`1px solid ${T.cb}`}}>
+                  <div style={{width:44,height:44,borderRadius:'50%',background:`linear-gradient(135deg, ${m.c}, ${m.c}88)`,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 10px',boxShadow:`0 4px 12px ${m.c}33`}}><Users size={18} color="#fff"/></div>
+                  <div style={{fontSize:12,fontWeight:700,color:T.text,lineHeight:1.3}}>{m.n}</div>
+                  <span style={{display:'inline-block',fontSize:9,fontWeight:700,color:m.c,background:`${m.c}12`,padding:'3px 10px',borderRadius:99,marginTop:6,letterSpacing:'.04em',textTransform:'uppercase'}}>{m.r}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
-        <footer className="site-footer" style={{borderTop:`1px solid ${T.div}`,padding:'18px 0 22px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-          <div style={{display:'flex',alignItems:'center',gap:6}}><Leaf size={15} color={T.acc}/><span style={{fontSize:14,fontWeight:800}}>EnviroPredict</span></div>
-          <p style={{fontSize:12,color:T.mut}}>AQI Prediction · XGBoost + FastAPI</p>
-          <p style={{fontSize:11,color:T.mut,display:'flex',alignItems:'center',gap:4}}><Heart size={10}/>Built with care</p>
+        <footer className="site-footer" style={{borderTop:`1px solid ${T.div}`,padding:'20px 0 24px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            <div style={{width:28,height:28,borderRadius:8,background:D?'#252523':'#f0f0f0',display:'flex',alignItems:'center',justifyContent:'center'}}><Leaf size={14} color={T.acc}/></div>
+            <span style={{fontSize:14,fontWeight:800}}>EnviroPredict</span>
+          </div>
+          <p style={{fontSize:12,color:T.mut}}>AQI Prediction System · XGBoost + FastAPI + React</p>
+          <p style={{fontSize:11,color:T.mut,display:'flex',alignItems:'center',gap:4}}><Heart size={10} color="#ef4444"/>Built with care in Odisha</p>
         </footer>
       </div>
     </div>
