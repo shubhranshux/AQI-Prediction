@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnviroPredict - Project Report</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@500;600;700&display=swap');
+        
+        :root {
+            --bg: #f9f9fc;
+            --text: #111827;
+            --sub: #6b7280;
+            --card: #ffffff;
+            --border: #e5e7eb;
+            --primary: #3b82f6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .page {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card);
+            padding: 40px 60px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            box-sizing: border-box;
+        }
+
+        @media print {
+            body { background: white; }
+            .page { box-shadow: none; padding: 0; max-width: 100%; margin: 0; }
+            .page-break { page-break-before: always; }
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--text);
+            margin-top: 0;
+        }
+
+        .header {
+            text-align: center;
+            padding-bottom: 30px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .header p {
+            font-size: 16px;
+            color: var(--sub);
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .section-title {
+            font-size: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            margin-top: 40px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--sub);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .card-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .color-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            box-shadow: 0 0 4px rgba(0,0,0,0.2);
+        }
+
+        .pollutant-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pollutant-header {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .pollutant-bar-bg {
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .pollutant-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: #f8fafc;
+            font-weight: 700;
+            color: var(--sub);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+        }
+
+        .aqi-level {
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            display: inline-block;
+        }
+
+        .team-member {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .team-role {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 8px;
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 99px;
+        }
+
+        ul.tech-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        ul.tech-list li {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        ul.tech-list li::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            margin-right: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>EnviroPredict</h1>
+            <p>Air Quality Index (AQI) Prediction System</p>
+            <p style="font-size: 14px; margin-top: 5px;">Comprehensive Technical & Visual Report</p>
+        </div>
+
+        <!-- EXECUTIVE SUMMARY -->
+        <h2 class="section-title">1. Executive Summary</h2>
+        <p>
+            EnviroPredict is a hyper-local, machine learning-powered Air Quality Index (AQI) prediction system designed specifically for the state of Odisha. Combining real-time environmental data pipelines with an advanced <strong>XGBoost ML Engine</strong>, the application delivers highly accurate predictions across 9 districts and over 400 locations.
+        </p>
+
+        <div class="grid-3">
+            <div class="card">
+                <div class="card-title">Model Accuracy</div>
+                <div class="card-value" style="color: #22c55e;">98.83%</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Data Points</div>
+                <div class="card-value" style="color: #3b82f6;">25,000+</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Supported Locations</div>
+                <div class="card-value" style="color: #a855f7;">400+</div>
+            </div>
+        </div>
+
+        <!-- AQI LEVELS & COLORS -->
+        <h2 class="section-title">2. AQI Levels & Color System</h2>
+        <p>The system categorizes air quality into six distinct levels, following standard environmental guidelines. Each level is associated with a specific color hex code used consistently across the UI for gauge meters, charts, and alerts.</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>AQI Range</th>
+                    <th>Category</th>
+                    <th>Color Hex</th>
+                    <th>Visual Indicator</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>0 - 50</td>
+                    <td><strong>Good</strong></td>
+                    <td><code style="color: #22c55e">#22c55e</code></td>
+                    <td><span class="aqi-level" style="background: #22c55e;">Good</span></td>
+                </tr>
+                <tr>
+                    <td>51 - 100</td>
+                    <td><strong>Satisfactory</strong></td>
+                    <td><code style="color: #eab308">#eab308</code></td>
+                    <td><span class="aqi-level" style="background: #eab308;">Satisfactory</span></td>
+                </tr>
+                <tr>
+                    <td>101 - 200</td>
+                    <td><strong>Moderate</strong></td>
+                    <td><code style="color: #f97316">#f97316</code></td>
+                    <td><span class="aqi-level" style="background: #f97316;">Moderate</span></td>
+                </tr>
+                <tr>
+                    <td>201 - 300</td>
+                    <td><strong>Poor</strong></td>
+                    <td><code style="color: #ef4444">#ef4444</code></td>
+                    <td><span class="aqi-level" style="background: #ef4444;">Poor</span></td>
+                </tr>
+                <tr>
+                    <td>301 - 400</td>
+                    <td><strong>Very Poor</strong></td>
+                    <td><code style="color: #a855f7">#a855f7</code></td>
+                    <td><span class="aqi-level" style="background: #a855f7;">Very Poor</span></td>
+                </tr>
+                <tr>
+                    <td>401 - 500</td>
+                    <td><strong>Severe</strong></td>
+                    <td><code style="color: #dc2626">#dc2626</code></td>
+                    <td><span class="aqi-level" style="background: #dc2626;">Severe</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="page-break"></div>
+
+        <!-- POLLUTANT PARAMETERS -->
+        <h2 class="section-title">3. Pollutant Parameters Analyzed</h2>
+        <p>The prediction model evaluates six critical pollutants along with temperature and humidity. The user interface visualizes these pollutants with dedicated thematic colors and dynamic progress bars based on their safe maximum limits.</p>
+
+        <div class="grid-2">
+            <div class="pollutant-card">
+                <div class="pollutant-header">
+                    <span class="color-dot" style="background: #22c55e;"></span> PM2.5
+                </div>
+                <div style="font-size: 13px; color: var(--sub);">Unit: <strong>µg/m³</strong> | Max Safe Scale: 250</div>
+                <div class="pollutant-bar-bg"><div class="pollutant-bar-fill" style="width: 45%; background: #22c55e;"></div></div>
+            </div>
+            
+            <div class="pollutant-card">
+                <div class="pollutant-header">
+                    <span class="color-dot" style="background: #3b82f6;"></span> PM10
+                </div>
+                <div style="font-size: 13px; color: var(--sub);">Unit: <strong>µg/m³</strong> | Max Safe Scale: 430</div>
+                <div class="pollutant-bar-bg"><div class="pollutant-bar-fill" style="width: 30%; background: #3b82f6;"></div></div>
+            </div>
+
+            <div class="pollutant-card">
+                <div class="pollutant-header">
+                    <span class="color-dot" style="background: #eab308;"></span> Ozone (O₃)
+                </div>
+                <div style="font-size: 13px; color: var(--sub);">Unit: <strong>µg/m³ / ppb</strong> | Max Safe Scale: 200</div>
+                <div class="pollutant-bar-bg"><div class="pollutant-bar-fill" style="width: 60%; background: #eab308;"></div></div>
+            </div>
+
+            <div class="pollutant-card">
+                <div class="pollutant-header">
+                    <span class="color-dot" style="background: #f472b6;"></span> Nitrogen Dioxide (NO₂)
+                </div>
+                <div style="font-size: 13px; color: var(--sub);">Unit: <strong>µg/m³ / ppb</strong> | Max Safe Scale: 200</div>
+                <div class="pollutant-bar-bg"><div class="pollutant-bar-fill" style="width: 25%; background: #f472b6;"></div></div>
+            </div>
+
+            <div class="pollutant-card">
+                <div class="pollutant-header">
+                    <span class="color-dot" style="background: #a78bfa;"></span> Carbon Monoxide (CO)
+                </div>
+                <div style="font-size: 13px; color: var(--sub);">Unit: <strong>mg/m³</strong> | Max Safe Scale: 10</div>
+                <div class="pollutant-bar-bg"><div class="pollutant-bar-fill" style="width: 15%; background: #a78bfa;"></div></div>
+            </div>
+
+            <div class="pollutant-card">
+                <div class="pollutant-header">
+                    <span class="color-dot" style="background: #f97316;"></span> Sulfur Dioxide (SO₂)
+                </div>
+                <div style="font-size: 13px; color: var(--sub);">Unit: <strong>µg/m³ / ppb</strong> | Max Safe Scale: 350</div>
+                <div class="pollutant-bar-bg"><div class="pollutant-bar-fill" style="width: 10%; background: #f97316;"></div></div>
+            </div>
+        </div>
+
+        <!-- MODEL PERFORMANCE & METRICS -->
+        <div class="page-break"></div>
+        <h2 class="section-title">4. Model Performance & Metrics</h2>
+        <p>The system's performance is comprehensively evaluated using both regression and classification metrics to ensure utmost reliability of the AQI predictions.</p>
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title">Regression Metrics</div>
+                <ul style="list-style: none; padding: 0; margin: 0; font-size: 15px;">
+                    <li style="margin-bottom: 8px;"><strong>R² Score:</strong> 0.9961</li>
+                    <li style="margin-bottom: 8px;"><strong>RMSE:</strong> 3.41</li>
+                    <li style="margin-bottom: 8px;"><strong>MAE:</strong> 1.40</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-title">Classification Metrics</div>
+                <ul style="list-style: none; padding: 0; margin: 0; font-size: 15px;">
+                    <li style="margin-bottom: 8px;"><strong>Accuracy:</strong> 98.30% (0.9830)</li>
+                    <li style="margin-bottom: 8px;"><strong>Precision:</strong> 0.9828</li>
+                    <li style="margin-bottom: 8px;"><strong>Recall:</strong> 0.9830</li>
+                    <li style="margin-bottom: 8px;"><strong>F1-Score:</strong> 0.9829</li>
+                </ul>
+            </div>
+        </div>
+        <div class="card" style="margin-bottom: 20px;">
+            <div class="card-title">Cross-Validation</div>
+            <p style="margin: 0; font-size: 15px;"><strong>CV R² Scores:</strong> [0.9754, 0.9833, 0.9917, 0.9891, 0.9360]</p>
+            <p style="margin: 5px 0 0; font-size: 15px;"><strong>Mean CV R²:</strong> 0.9751 ± 0.0203</p>
+        </div>
+
+        <!-- PLOTS & VISUALIZATIONS -->
+        <h2 class="section-title">5. Data Visualizations & Analysis</h2>
+        <p>A comprehensive set of plots generated during Exploratory Data Analysis (EDA) and Model Training phases.</p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+            <div class="card" style="padding: 10px;">
+                <div class="card-title" style="text-align: center;">Actual vs Predicted AQI</div>
+                <img src="plots/actual_vs_predicted.png" style="width: 100%; border-radius: 8px;">
+            </div>
+            <div class="card" style="padding: 10px;">
+                <div class="card-title" style="text-align: center;">Feature Importance</div>
+                <img src="plots/feature_importance.png" style="width: 100%; border-radius: 8px;">
+            </div>
+            <div class="card" style="padding: 10px;">
+                <div class="card-title" style="text-align: center;">Residual Analysis</div>
+                <img src="plots/residual_analysis.png" style="width: 100%; border-radius: 8px;">
+            </div>
+            <div class="card" style="padding: 10px;">
+                <div class="card-title" style="text-align: center;">Correlation Heatmap</div>
+                <img src="plots/correlation_heatmap.png" style="width: 100%; border-radius: 8px;">
+            </div>
+        </div>
+
+        <div class="page-break"></div>
+        <h3 style="margin-top: 20px; color: var(--primary);">Distribution & Trends</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+            <div class="card" style="padding: 10px;">
+                <div class="card-title" style="text-align: center;">AQI Distribution</div>
+                <img src="plots/aqi_distribution.png" style="width: 100%; border-radius: 8px;">
+            </div>
+            <div class="card" style="padding: 10px;">
+                <div class="card-title" style="text-align: center;">Pollutant Distributions</div>
+                <img src="plots/pollutant_distributions.png" style="width: 100%; border-radius: 8px;">
+            </div>
+            <div class="card" style="padding: 10px;">
+                <div class="card-title" style="text-align: center;">Monthly AQI Trend</div>
+                <img src="plots/monthly_aqi_trend.png" style="width: 100%; border-radius: 8px;">
+            </div>
+            <div class="card" style="padding: 10px;">
+                <div class="card-title" style="text-align: center;">Seasonal AQI Pattern</div>
+                <img src="plots/seasonal_aqi_pattern.png" style="width: 100%; border-radius: 8px;">
+            </div>
+            <div class="card" style="padding: 10px; grid-column: span 2;">
+                <div class="card-title" style="text-align: center;">Location Wise AQI</div>
+                <img src="plots/location_wise_aqi.png" style="width: 100%; border-radius: 8px;">
+            </div>
+        </div>
+
+        <!-- USER INTERFACE & EXPERIENCE -->
+        <div class="page-break"></div>
+        <h2 class="section-title">6. User Interface & Experience (UI/UX)</h2>
+        <p>The EnviroPredict dashboard features a hyper-responsive, cinematic design aimed at delivering complex environmental data through a highly accessible and visually striking interface.</p>
+        
+        <div class="grid-2" style="margin-bottom: 40px;">
+            <div class="card">
+                <div class="card-title">Bento Grid Architecture</div>
+                <p style="font-size: 14px; margin: 0; color: var(--sub);">A modern, compartmentalized 3-column dashboard layout that elegantly organizes scan controls, dynamic pollutant breakdowns, and the main ML predicted gauge meter into distinct semantic blocks.</p>
+            </div>
+            <div class="card">
+                <div class="card-title">Hyper-Responsive Scaling</div>
+                <p style="font-size: 14px; margin: 0; color: var(--sub);">Built with a mobile-first approach using custom media queries, the application flawlessly adapts across all devices, scaling from sweeping desktop vistas to perfectly stacked mobile column layouts.</p>
+            </div>
+            <div class="card">
+                <div class="card-title">Dynamic Dark/Light Theming</div>
+                <p style="font-size: 14px; margin: 0; color: var(--sub);">Users can seamlessly toggle between Light and Dark modes. The application intelligently adjusts all background cards, text contrast, glow effects, and interactive elements to minimize eye strain.</p>
+            </div>
+            <div class="card">
+                <div class="card-title">Polished Micro-Interactions</div>
+                <p style="font-size: 14px; margin: 0; color: var(--sub);">Premium hover lift effects, staggering element fade-ups, and native CSS transitions make the data exploration process feel alive, premium, and highly engaging.</p>
+            </div>
+        </div>
+
+        <!-- TECHNOLOGY STACK -->
+        <div class="page-break"></div>
+        <h2 class="section-title">7. Technology Stack</h2>
+        <ul class="tech-list">
+            <li><span style="color: #d4a574; margin-right: 8px;">●</span> XGBoost (ML Engine)</li>
+            <li><span style="color: #059669; margin-right: 8px;">●</span> FastAPI (REST Backend)</li>
+            <li><span style="color: #61dafb; margin-right: 8px;">●</span> React (Frontend UI)</li>
+            <li><span style="color: #a855f7; margin-right: 8px;">●</span> Vite (Build Tool)</li>
+            <li><span style="color: #f97316; margin-right: 8px;">●</span> scikit-learn (Data Pipeline)</li>
+            <li><span style="color: #3b82f6; margin-right: 8px;">●</span> Open-Meteo (Live AQ Data)</li>
+            <li><span style="color: #38bdf8; margin-right: 8px;">●</span> Tailwind / Vanilla CSS</li>
+            <li><span style="color: #6b7280; margin-right: 8px;">●</span> Lucide Icons</li>
+        </ul>
+
+        <!-- DEVELOPMENT TEAM -->
+        <h2 class="section-title">8. Development Team</h2>
+        <div class="grid-2">
+            <div class="team-member">
+                <div style="font-weight: 800; font-size: 16px;">Shubhranshu Behera</div>
+                <div class="team-role" style="color: #d4a574; background: rgba(212,165,116,0.1);">ML & Backend Lead</div>
+            </div>
+            <div class="team-member">
+                <div style="font-weight: 800; font-size: 16px;">Rupak Ranjan Parida</div>
+                <div class="team-role" style="color: #3b82f6; background: rgba(59,130,246,0.1);">Data Analysis</div>
+            </div>
+            <div class="team-member">
+                <div style="font-weight: 800; font-size: 16px;">Ranjan Kumar Nayak</div>
+                <div class="team-role" style="color: #22c55e; background: rgba(34,197,94,0.1);">Research</div>
+            </div>
+            <div class="team-member">
+                <div style="font-weight: 800; font-size: 16px;">Pramod Kumar Mohananta</div>
+                <div class="team-role" style="color: #a855f7; background: rgba(168,85,247,0.1);">Frontend</div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--sub);">
+            EnviroPredict AQI Prediction System | Built with care in Odisha | Date: 2026-05-02
+        </div>
+    </div>
+</body>
+</html>

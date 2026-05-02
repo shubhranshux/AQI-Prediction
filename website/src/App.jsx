@@ -205,7 +205,6 @@ export default function App(){
           <div className="hover-lift" style={{...CS,padding:24}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
               <div style={{...LB,fontSize:12}}>Pollutant Breakdown</div>
-              {p&&<span style={{fontSize:10,fontWeight:700,color:'#22c55e',background:'rgba(34,197,94,.08)',padding:'3px 10px',borderRadius:99}}>● LIVE</span>}
             </div>
             {p?(
               <div className="pollutant-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
@@ -245,19 +244,11 @@ export default function App(){
             <div style={{display:'flex',alignItems:'baseline',gap:12,marginTop:4}}>
               <div style={{textAlign:'center'}}>
                 <div style={{fontSize:48,fontWeight:900,color:lv?.color||T.mut,lineHeight:1}}>{aqi??'--'}</div>
-                <div style={{fontSize:9,letterSpacing:'.1em',textTransform:'uppercase',color:T.sub,fontWeight:700,marginTop:4}}>ML Predicted</div>
+                <div style={{fontSize:9,letterSpacing:'.1em',textTransform:'uppercase',color:T.sub,fontWeight:700,marginTop:4}}>Predicted AQI</div>
               </div>
-              {result?.real_time_aqi!=null&&<>
-                <div style={{fontSize:20,color:T.mut,fontWeight:300}}>|</div>
-                <div style={{textAlign:'center'}}>
-                  <div style={{fontSize:32,fontWeight:800,color:getLevel(result.real_time_aqi)?.color||T.mut,lineHeight:1}}>{result.real_time_aqi}</div>
-                  <div style={{fontSize:9,letterSpacing:'.1em',textTransform:'uppercase',color:T.sub,fontWeight:700,marginTop:4}}>Real-time</div>
-                </div>
-              </>}
             </div>
             {lv&&<span style={{display:'inline-flex',alignItems:'center',gap:5,padding:'5px 14px',borderRadius:99,fontSize:12,fontWeight:700,color:lv.color,background:`${lv.color}10`,marginTop:10}}><LI size={13}/>{lv.label}</span>}
             {result&&<div style={{display:'flex',alignItems:'center',gap:4,fontSize:12,color:T.sub,marginTop:6}}><MapPin size={12}/>{result.location}, {result.district}</div>}
-            {result?.data_source&&<div style={{fontSize:9,color:T.mut,marginTop:4,fontWeight:600,letterSpacing:'.04em'}}>{result.data_source}</div>}
             <div style={{width:'100%',marginTop:14,paddingTop:10,borderTop:`1px solid ${T.div}`}}>
               <div style={{display:'flex',justifyContent:'space-between'}}>
                 {LEVELS.map(l=>{const on=aqi!==null&&aqi<=l.max&&(LEVELS.indexOf(l)===0||aqi>LEVELS[LEVELS.indexOf(l)-1].max);return(
