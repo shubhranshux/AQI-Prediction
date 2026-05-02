@@ -314,29 +314,72 @@ export default function HeroBackground({ isNight = false }) {
             <rect x="2" y="0" width="2" height="3" fill={C.house}/>
           </g>
 
-          {/* ═══ FLOWING RIVER ═══ */}
-          {/* Main river path winding through the valley */}
-          <path d="M680 200 Q720 220 740 245 Q760 265 800 278 Q860 290 940 295 Q1040 298 1150 302 Q1280 308 1400 315 Q1500 320 1600 325"
-            fill="none" stroke="url(#zriv)" strokeWidth="8" strokeLinecap="round"
-            opacity=".6"/>
-          {/* Shimmer line on river */}
-          <path d="M680 200 Q720 220 740 245 Q760 265 800 278 Q860 290 940 295 Q1040 298 1150 302 Q1280 308 1400 315 Q1500 320 1600 325"
-            fill="none" stroke={C.riverShine} strokeWidth="2" strokeLinecap="round"
-            strokeDasharray="8 12"
-            opacity=".5"
-            style={{animation:'zr-flow 3s linear infinite'}}/>
-          {/* Second shimmer offset */}
-          <path d="M680 200 Q720 220 740 245 Q760 265 800 278 Q860 290 940 295 Q1040 298 1150 302 Q1280 308 1400 315 Q1500 320 1600 325"
-            fill="none" stroke={C.riverShine} strokeWidth="1.5" strokeLinecap="round"
-            strokeDasharray="5 15"
-            opacity=".3"
-            style={{animation:'zr-flow 4s linear infinite', animationDelay:'-1.5s'}}/>
+          {/* ═══ REALISTIC RIVER ═══ */}
+          {/* River body — filled shape that widens toward foreground for perspective */}
+          <path d="M690 195 Q710 210 725 232 Q738 252 755 266 Q780 280 820 288 Q870 296 940 300 Q1040 304 1160 308 Q1300 314 1420 320 Q1520 325 1600 330 L1600 340 Q1520 335 1420 330 Q1300 324 1160 318 Q1040 314 940 310 Q870 306 820 298 Q780 290 758 278 Q742 264 730 244 Q718 224 700 208 Z"
+            fill="url(#zriv)" opacity=".7"/>
+          {/* Deeper center channel */}
+          <path d="M694 198 Q712 213 727 235 Q740 254 757 268 Q782 282 822 290 Q872 298 942 302 Q1042 306 1162 310 Q1302 316 1422 322 Q1522 327 1600 332 L1600 336 Q1522 331 1422 326 Q1302 320 1162 314 Q1042 310 942 306 Q872 302 822 294 Q782 286 760 274 Q744 260 732 240 Q720 220 702 206 Z"
+            fill={C.riverShine} opacity=".15"/>
 
-          {/* River banks (subtle darker lines) */}
-          <path d="M678 198 Q718 218 738 243 Q758 263 798 276 Q858 288 938 293 Q1038 296 1148 300 Q1278 306 1398 313 Q1498 318 1600 323"
-            fill="none" stroke={C.mt4b} strokeWidth="1" opacity=".3"/>
-          <path d="M682 202 Q722 222 742 247 Q762 267 802 280 Q862 292 942 297 Q1042 300 1152 304 Q1282 310 1402 317 Q1502 322 1600 327"
-            fill="none" stroke={C.mt4b} strokeWidth="1" opacity=".3"/>
+          {/* Animated shimmer reflections — light dancing on water */}
+          <path d="M695 200 Q715 218 730 240 Q745 258 762 272 Q790 285 830 293 Q880 300 950 304 Q1060 308 1180 312 Q1320 318 1440 324 Q1540 329 1600 334"
+            fill="none" stroke={C.riverShine} strokeWidth="3" strokeLinecap="round"
+            strokeDasharray="12 18 6 22"
+            opacity=".45"
+            style={{animation:'zr-flow 2.5s linear infinite'}}/>
+          <path d="M695 200 Q715 218 730 240 Q745 258 762 272 Q790 285 830 293 Q880 300 950 304 Q1060 308 1180 312 Q1320 318 1440 324 Q1540 329 1600 334"
+            fill="none" stroke={C.riverShine} strokeWidth="1.5" strokeLinecap="round"
+            strokeDasharray="4 20 8 16"
+            opacity=".3"
+            style={{animation:'zr-flow 4s linear infinite', animationDelay:'-2s'}}/>
+          <path d="M698 204 Q716 220 732 242 Q748 260 764 274 Q792 287 832 295 Q882 302 952 306 Q1062 310 1182 314 Q1322 320 1440 326 Q1540 331 1600 336"
+            fill="none" stroke={C.riverShine} strokeWidth="2" strokeLinecap="round"
+            strokeDasharray="3 25 10 14"
+            opacity=".2"
+            style={{animation:'zr-flow 5.5s linear infinite', animationDelay:'-3.5s'}}/>
+
+          {/* Ripple marks (small ellipses on the water surface) */}
+          <ellipse cx="780" cy="282" rx="8" ry="2" fill="none" stroke={C.riverShine} strokeWidth=".8" opacity=".3">
+            <animate attributeName="rx" values="6;10;6" dur="3s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values=".3;.1;.3" dur="3s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="920" cy="298" rx="10" ry="2.5" fill="none" stroke={C.riverShine} strokeWidth=".8" opacity=".25">
+            <animate attributeName="rx" values="8;13;8" dur="4s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values=".25;.08;.25" dur="4s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="1100" cy="309" rx="12" ry="3" fill="none" stroke={C.riverShine} strokeWidth=".7" opacity=".2">
+            <animate attributeName="rx" values="10;15;10" dur="3.5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values=".2;.06;.2" dur="3.5s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="1320" cy="318" rx="14" ry="3" fill="none" stroke={C.riverShine} strokeWidth=".6" opacity=".18">
+            <animate attributeName="rx" values="12;18;12" dur="4.5s" repeatCount="indefinite"/>
+          </ellipse>
+
+          {/* River banks — soft vegetation edges */}
+          <path d="M688 194 Q708 208 722 230 Q735 250 752 264 Q778 278 818 286 Q868 294 938 298 Q1038 302 1158 306 Q1298 312 1418 318 Q1518 323 1600 328"
+            fill="none" stroke={C.treeLine} strokeWidth="2.5" opacity=".25" strokeLinecap="round"/>
+          <path d="M702 210 Q720 226 735 246 Q748 264 765 278 Q790 290 830 298 Q880 306 950 310 Q1050 314 1170 318 Q1310 324 1430 330 Q1530 335 1600 340"
+            fill="none" stroke={C.treeLine} strokeWidth="2" opacity=".2" strokeLinecap="round"/>
+
+          {/* Small bushes along near bank */}
+          {[{x:800,y:290},{x:860,y:296},{x:950,y:302},{x:1060,y:308},{x:1200,y:314},{x:1350,y:322}].map((b,i)=>
+            <g key={i} transform={`translate(${b.x},${b.y})`} opacity=".4">
+              <ellipse cx="0" cy="0" rx={4+i%3} ry={3+i%2} fill={C.treeLine}/>
+            </g>
+          )}
+
+          {/* Small stone bridge crossing the river */}
+          <g transform="translate(885, 290)" opacity=".6">
+            {/* Bridge arch */}
+            <path d="M-14 5 Q-10 -6 0 -8 Q10 -6 14 5" fill="none" stroke={N?'#2a3040':'#6b5a48'} strokeWidth="3" strokeLinecap="round"/>
+            {/* Bridge surface */}
+            <rect x="-15" y="-9" width="30" height="3" rx="1" fill={N?'#222838':'#7a6850'}/>
+            {/* Stone texture dots */}
+            <circle cx="-8" cy="-8" r=".8" fill={N?'#3a4050':'#8a7860'} opacity=".6"/>
+            <circle cx="0" cy="-8" r=".8" fill={N?'#3a4050':'#8a7860'} opacity=".6"/>
+            <circle cx="8" cy="-8" r=".8" fill={N?'#3a4050':'#8a7860'} opacity=".6"/>
+          </g>
         </svg>
 
         {/* Mist layer */}

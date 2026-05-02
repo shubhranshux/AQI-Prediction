@@ -162,10 +162,11 @@ export default function App(){
               <div style={{width:32,height:32,borderRadius:8,background:'rgba(255,255,255,.15)',backdropFilter:'blur(8px)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 12px rgba(0,0,0,.2)'}}><Leaf size={15} color="#fff"/></div>
               <span style={{fontSize:15,fontWeight:800,color:'#fff',textShadow:'0 2px 8px rgba(0,0,0,.4)'}}>EnviroPredict</span>
             </div>
-            <div style={{display:'flex',alignItems:'center',gap:12}}>
+            <div style={{display:'flex',alignItems:'center',gap:14}}>
               <ClockDisplay />
-              <button onClick={()=>setDark(!D)} style={{width:34,height:20,borderRadius:10,border:'1px solid rgba(255,255,255,.2)',background:'rgba(255,255,255,.1)',cursor:'pointer',position:'relative',padding:0,backdropFilter:'blur(4px)',boxShadow:'0 2px 8px rgba(0,0,0,.3)'}}>
-                <div style={{width:14,height:14,borderRadius:7,background:D?'#fbbf24':'#fff',position:'absolute',top:2,left:D?17:2,transition:'all .3s',boxShadow:'0 1px 2px rgba(0,0,0,.2)'}}/>
+              <button onClick={()=>setDark(!D)} style={{display:'flex',alignItems:'center',gap:6,padding:'7px 14px',borderRadius:99,border:'1px solid rgba(255,255,255,.25)',background:'rgba(255,255,255,.12)',backdropFilter:'blur(10px)',cursor:'pointer',boxShadow:'0 4px 16px rgba(0,0,0,.25)',transition:'all .3s ease'}}>
+                {D ? <Sun size={14} color="#fbbf24"/> : <Moon size={14} color="#e2e8f0"/>}
+                <span style={{fontSize:11,fontWeight:700,color:'#fff',letterSpacing:'.03em'}}>{D?'Light':'Dark'}</span>
               </button>
             </div>
           </div>
