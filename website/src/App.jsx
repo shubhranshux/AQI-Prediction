@@ -244,7 +244,6 @@ export default function App(){
             <div style={{display:'flex',alignItems:'baseline',gap:12,marginTop:4}}>
               <div style={{textAlign:'center'}}>
                 <div style={{fontSize:48,fontWeight:900,color:lv?.color||T.mut,lineHeight:1}}>{aqi??'--'}</div>
-                <div style={{fontSize:9,letterSpacing:'.1em',textTransform:'uppercase',color:T.sub,fontWeight:700,marginTop:4}}>Predicted AQI</div>
               </div>
             </div>
             {lv&&<span style={{display:'inline-flex',alignItems:'center',gap:5,padding:'5px 14px',borderRadius:99,fontSize:12,fontWeight:700,color:lv.color,background:`${lv.color}10`,marginTop:10}}><LI size={13}/>{lv.label}</span>}
@@ -276,7 +275,7 @@ export default function App(){
         <div id="features" className="gsap-stagger-section" style={{marginTop:32,marginBottom:20,position:'relative',zIndex:30}}>
           <div style={{textAlign:'center',marginBottom:24}}><div style={LB}>Why EnviroPredict</div><h2 style={{fontSize:30,fontWeight:900,margin:'4px 0'}}>Built for Precision</h2><p style={{fontSize:14,color:T.sub,maxWidth:480,margin:'8px auto 0'}}>Combining cutting-edge ML models with live environmental data for the most accurate AQI predictions in Odisha.</p></div>
           <div className="features-grid" style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:14}}>
-            {[{I:Cpu,t:'ML Powered',d:'XGBoost with 98.83% accuracy trained on 25,000+ data points.',c:'#d4a574'},{I:Database,t:'Live Data',d:'Real-time pollutant data from calibrated Open-Meteo API.',c:'#3b82f6'},{I:BarChart3,t:'6 Pollutants',d:'PM2.5, PM10, NO₂, SO₂, CO, O₃ analyzed simultaneously.',c:'#22c55e'},{I:Sparkles,t:'Smart UI',d:'Animated landscape reacts to AQI conditions in real-time.',c:'#a855f7'}].map(f=>(
+            {[{I:Cpu,t:'ML Powered',d:'XGBoost with 98.83% accuracy trained on 25,000+ data points.',c:'#d4a574'},{I:Database,t:'Location Data',d:'Comprehensive pollutant data from calibrated Open-Meteo API.',c:'#3b82f6'},{I:BarChart3,t:'6 Pollutants',d:'PM2.5, PM10, NO₂, SO₂, CO, O₃ analyzed simultaneously.',c:'#22c55e'},{I:Sparkles,t:'Smart UI',d:'Animated landscape reacts to AQI conditions dynamically.',c:'#a855f7'}].map(f=>(
               <div key={f.t} className="hover-lift" style={{...CS,padding:22,textAlign:'center'}}>
                 <div style={{width:48,height:48,borderRadius:14,background:`${f.c}12`,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 14px',border:`1px solid ${f.c}20`}}><f.I size={22} color={f.c}/></div>
                 <div style={{fontSize:15,fontWeight:800,marginBottom:6}}>{f.t}</div><div style={{fontSize:12,color:T.sub,lineHeight:1.6}}>{f.d}</div>
