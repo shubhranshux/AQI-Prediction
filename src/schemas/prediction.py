@@ -38,8 +38,10 @@ class ParametersResponse(BaseModel):
 class PredictionResponse(BaseModel):
     """Response body for AQI prediction results."""
     predicted_aqi: int
+    real_time_aqi: Optional[int] = None
     category: str
     emoji: str
+    rt_category: Optional[str] = None
     parameters: ParametersResponse
     location: str
     district: str
