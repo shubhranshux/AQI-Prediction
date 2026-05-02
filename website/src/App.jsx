@@ -14,15 +14,48 @@ const TIME={'Good Morning':{I:Sunrise,s:"Fresh air awaits you"},'Good Afternoon'
 const FIELDS=[{k:'pm25',l:'PM2.5',u:'µg/m³'},{k:'pm10',l:'PM10',u:'µg/m³'},{k:'no2',l:'NO₂',u:'ppb'},{k:'so2',l:'SO₂',u:'ppb'},{k:'co',l:'CO',u:'mg/m³'},{k:'o3',l:'O₃',u:'ppb'},{k:'temp',l:'Temp',u:'°C'},{k:'humidity',l:'Humidity',u:'%'}];
 
 function Gauge({aqi,color,dark}){
-  const r=70,cx=85,cy=85,c=Math.PI*r,p=Math.min(aqi/500,1),d=p*c;
+  const cx=120,cy=120,r=96,strk=28,p=Math.min(aqi/500,1);
+  const T = dark ? { cut:'#111110', ndl:'#f8fafc', ndlHole:'#111110', txt:'rgba(255,255,255,.5)' } : { cut:'#ffffff', ndl:'#334155', ndlHole:'#ffffff', txt:'rgba(0,0,0,.5)' };
   return(
-    <svg width="170" height="105" viewBox="0 0 170 105" style={{overflow:'visible'}}>
-      <defs><linearGradient id="gg" x1="0%" y1="0%" x2="100%"><stop offset="0%" stopColor="#22c55e"/><stop offset="35%" stopColor="#eab308"/><stop offset="65%" stopColor="#f97316"/><stop offset="100%" stopColor="#ef4444"/></linearGradient></defs>
-      <path d={`M${cx-r} ${cy} A${r} ${r} 0 0 1 ${cx+r} ${cy}`} fill="none" stroke={dark?"rgba(255,255,255,.08)":"rgba(0,0,0,.06)"} strokeWidth="6" strokeLinecap="round"/>
-      <path d={`M${cx-r} ${cy} A${r} ${r} 0 0 1 ${cx+r} ${cy}`} fill="none" stroke="url(#gg)" strokeWidth="6" strokeLinecap="round" strokeDasharray={`${d} ${c}`} style={{transition:'stroke-dasharray 1.5s cubic-bezier(.22,1,.36,1)'}}/>
-      {(()=>{const a=Math.PI*(1-p),nx=cx+(r-8)*Math.cos(a),ny=cy-(r-8)*Math.sin(a);return<line x1={cx} y1={cy} x2={nx} y2={ny} stroke={color} strokeWidth="2" strokeLinecap="round" style={{transition:'all 1.5s'}}/>})()}
-      <circle cx={cx} cy={cy} r="3" fill={color}/>
-      {["0","250","500"].map((l,i)=>{const t=i/2,a=Math.PI*(1-t);return<text key={i} x={cx+(r+14)*Math.cos(a)} y={cy-(r+14)*Math.sin(a)+3} textAnchor="middle" fill={dark?"rgba(255,255,255,.2)":"rgba(0,0,0,.2)"} fontSize="8" fontFamily="Inter">{l}</text>})}
+    <svg width="240" height="140" viewBox="0 0 240 140" style={{overflow:'visible',marginTop:10}}>
+      <defs>
+        <linearGradient id="gg" x1="0%" y1="0%" x2="100%">
+          <stop offset="0%" stopColor="#22c55e"/>
+          <stop offset="20%" stopColor="#84cc16"/>
+          <stop offset="40%" stopColor="#eab308"/>
+          <stop offset="60%" stopColor="#f97316"/>
+          <stop offset="80%" stopColor="#ef4444"/>
+          <stop offset="100%" stopColor="#991b1b"/>
+        </linearGradient>
+      </defs>
+      
+      {/* Full colored arc */}
+      <path d={`M${cx-r} ${cy} A${r} ${r} 0 0 1 ${cx+r} ${cy}`} fill="none" stroke="url(#gg)" strokeWidth={strk} strokeLinecap="butt"/>
+      
+      {/* Cutting lines for 10 segments */}
+      {[...Array(9)].map((_,i)=>{
+        const a = Math.PI - (i+1)*(Math.PI/10);
+        return <line key={i} x1={cx+(r-strk/2-2)*Math.cos(a)} y1={cy-(r-strk/2-2)*Math.sin(a)} x2={cx+(r+strk/2+2)*Math.cos(a)} y2={cy-(r+strk/2+2)*Math.sin(a)} stroke={T.cut} strokeWidth="4"/>
+      })}
+
+      {/* Value Labels along inner arc */}
+      {[0,100,200,300,400,500].map((v,i)=>{
+        const a = Math.PI - i*(Math.PI/5);
+        const lx = cx+(r-strk/2-18)*Math.cos(a);
+        const ly = cy-(r-strk/2-18)*Math.sin(a) + (i===0||i===5?4:4);
+        return <text key={v} x={lx} y={ly} textAnchor="middle" fill={T.txt} fontSize="11" fontWeight="700">{v}</text>
+      })}
+
+      {/* Low / High Labels */}
+      <text x={cx-r} y={cy+26} textAnchor="middle" fill={T.txt} fontSize="13" fontWeight="800">Low</text>
+      <text x={cx+r} y={cy+26} textAnchor="middle" fill={T.txt} fontSize="13" fontWeight="800">High</text>
+
+      {/* Needle */}
+      <g transform={`translate(${cx}, ${cy}) rotate(${p*180 - 90})`} style={{transition:'transform 1.5s cubic-bezier(.34,1.56,.64,1)'}}>
+        <polygon points="-8,-6 0,-94 8,-6" fill={T.ndl} />
+        <circle cx="0" cy="0" r="14" fill={T.ndl} />
+        <circle cx="0" cy="0" r="6" fill={T.ndlHole} />
+      </g>
     </svg>
   );
 }
@@ -46,7 +79,7 @@ export default function App(){
   const theme=getAqiTheme(aqi);const p=result?.parameters;
   const T=D?{bg:'#000000',card:'#111110',cb:'rgba(255,255,255,.08)',text:'#f0ece4',sub:'#a09888',mut:'#6c665d',acc:'#d4a574',inp:'#1a1a18',inpB:'rgba(255,255,255,.10)',div:'rgba(255,255,255,.06)'}
     :{bg:'#f9f9fc',card:'#ffffff',cb:'rgba(0,0,0,.04)',text:'#111827',sub:'#6b7280',mut:'#9ca3af',acc:'#0f172a',inp:'#f3f4f6',inpB:'rgba(0,0,0,.05)',div:'rgba(0,0,0,.06)'};
-  const CS={background:T.card,border:`1px solid ${T.cb}`,borderRadius:24,boxShadow:D?'0 2px 16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.03)':'0 10px 30px rgba(0,0,0,.03), 0 1px 3px rgba(0,0,0,.02)'};
+  const CS={transition:'background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.4s ease',background:T.card,border:`1px solid ${T.cb}`,borderRadius:24,boxShadow:D?'0 2px 16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.03)':'0 10px 30px rgba(0,0,0,.03), 0 1px 3px rgba(0,0,0,.02)'};
   const LB={fontSize:11,color:T.sub,letterSpacing:'.08em',textTransform:'uppercase',fontWeight:700,marginBottom:12};
   const mainRef=useRef(null);
 
@@ -70,17 +103,17 @@ export default function App(){
           <HeroBackground isNight={time.isNight}/>
 
           {/* Dark overlay for text readability */}
-          <div style={{position:'absolute',inset:0,background:'linear-gradient(to top, rgba(0,0,0,.45) 0%, rgba(0,0,0,.1) 40%, transparent 70%)',zIndex:5}}/>
+          <div style={{position:'absolute',inset:0,background:'linear-gradient(to top, rgba(0,0,0,.65) 0%, rgba(0,0,0,.15) 50%, rgba(0,0,0,.4) 100%)',zIndex:5}}/>
 
           {/* Nav on top of landscape */}
           <div style={{position:'absolute',top:0,left:0,right:0,zIndex:15,padding:'20px 32px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
             <div style={{display:'flex',alignItems:'center',gap:8}}>
-              <div style={{width:32,height:32,borderRadius:8,background:'rgba(255,255,255,.15)',backdropFilter:'blur(8px)',display:'flex',alignItems:'center',justifyContent:'center'}}><Leaf size={15} color="#fff"/></div>
-              <span style={{fontSize:15,fontWeight:800,color:'#fff'}}>EnviroPredict</span>
+              <div style={{width:32,height:32,borderRadius:8,background:'rgba(255,255,255,.15)',backdropFilter:'blur(8px)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 12px rgba(0,0,0,.2)'}}><Leaf size={15} color="#fff"/></div>
+              <span style={{fontSize:15,fontWeight:800,color:'#fff',textShadow:'0 2px 8px rgba(0,0,0,.4)'}}>EnviroPredict</span>
             </div>
             <div style={{display:'flex',alignItems:'center',gap:12}}>
-              <span style={{fontSize:12,color:'rgba(255,255,255,.6)',display:'flex',alignItems:'center',gap:4}}><Clock size={12}/>{new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
-              <button onClick={()=>setDark(!D)} style={{width:34,height:20,borderRadius:10,border:'1px solid rgba(255,255,255,.2)',background:'rgba(255,255,255,.1)',cursor:'pointer',position:'relative',padding:0,backdropFilter:'blur(4px)'}}>
+              <span style={{fontSize:12,color:'rgba(255,255,255,.9)',display:'flex',alignItems:'center',gap:4,textShadow:'0 2px 8px rgba(0,0,0,.4)',fontWeight:600}}><Clock size={12}/>{new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
+              <button onClick={()=>setDark(!D)} style={{width:34,height:20,borderRadius:10,border:'1px solid rgba(255,255,255,.2)',background:'rgba(255,255,255,.1)',cursor:'pointer',position:'relative',padding:0,backdropFilter:'blur(4px)',boxShadow:'0 2px 8px rgba(0,0,0,.3)'}}>
                 <div style={{width:14,height:14,borderRadius:7,background:D?'#fbbf24':'#fff',position:'absolute',top:2,left:D?17:2,transition:'all .3s',boxShadow:'0 1px 2px rgba(0,0,0,.2)'}}/>
               </button>
             </div>
@@ -89,8 +122,8 @@ export default function App(){
           {/* Big text — bottom left */}
           <div className="hero-text-block" style={{position:'absolute',bottom:56,left:48,zIndex:10,maxWidth:540}}>
             <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:12}}>
-              <TI.I size={16} color="rgba(255,255,255,.7)"/>
-              <span style={{fontSize:13,color:'rgba(255,255,255,.7)',fontWeight:600,letterSpacing:'.02em'}}>{time.greeting} · Real-time AQI Prediction</span>
+              <TI.I size={16} color="#fff" style={{filter:'drop-shadow(0 2px 4px rgba(0,0,0,.4))'}}/>
+              <span style={{fontSize:13,color:'#fff',fontWeight:600,letterSpacing:'.02em',textShadow:'0 2px 8px rgba(0,0,0,.5)'}}>{time.greeting} · Real-time AQI Prediction</span>
             </div>
             <div className="hero-title" style={{fontSize:54,fontWeight:900,color:'#fff',lineHeight:1.08,letterSpacing:'-0.025em',textShadow:'0 2px 20px rgba(0,0,0,.3)'}}>
               Clean Air<br/>for Odisha<span style={{color:'#d4a574'}}>.</span>
@@ -139,24 +172,31 @@ export default function App(){
               <div style={{...LB,fontSize:12}}>Pollutant Breakdown</div>
               {p&&<span style={{fontSize:10,fontWeight:700,color:'#22c55e',background:'rgba(34,197,94,.08)',padding:'3px 10px',borderRadius:99}}>● LIVE</span>}
             </div>
-            {p?[
-              {k:'PM2.5',v:p.pm25,u:'µg/m³',m:250,c:'#22c55e'},
-              {k:'PM10',v:p.pm10,u:'µg/m³',m:430,c:'#3b82f6'},
-              {k:'O₃',v:p.o3,u:'µg/m³',m:200,c:'#eab308'},
-              {k:'NO₂',v:p.no2,u:'µg/m³',m:200,c:'#f472b6'},
-              {k:'CO',v:p.co,u:'mg/m³',m:10,c:'#a78bfa'},
-              {k:'SO₂',v:p.so2,u:'µg/m³',m:350,c:'#f97316'},
-            ].map(pl=>(
-              <div key={pl.k} style={{marginBottom:16}}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:5}}>
-                  <span style={{fontSize:15,fontWeight:700}}>{pl.k}</span>
-                  <span style={{fontSize:18,fontWeight:900,color:pl.c}}>{typeof pl.v==='number'?pl.v.toFixed(1):pl.v} <span style={{fontSize:11,color:T.sub,fontWeight:500}}>{pl.u}</span></span>
-                </div>
-                <div style={{height:5,borderRadius:99,background:D?'rgba(255,255,255,.08)':'rgba(0,0,0,.06)',overflow:'hidden'}}>
-                  <div style={{height:'100%',borderRadius:99,width:bars?`${Math.min((pl.v/pl.m)*100,100)}%`:'0%',background:`linear-gradient(90deg, ${pl.c}, ${pl.c}cc)`,transition:'width 1.4s cubic-bezier(.22,1,.36,1)'}}/>
-                </div>
+            {p?(
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+                {[
+                  {k:'PM2.5',v:p.pm25,u:'µg/m³',m:250,c:'#22c55e'},
+                  {k:'PM10',v:p.pm10,u:'µg/m³',m:430,c:'#3b82f6'},
+                  {k:'O₃',v:p.o3,u:'µg/m³',m:200,c:'#eab308'},
+                  {k:'NO₂',v:p.no2,u:'µg/m³',m:200,c:'#f472b6'},
+                  {k:'CO',v:p.co,u:'mg/m³',m:10,c:'#a78bfa'},
+                  {k:'SO₂',v:p.so2,u:'µg/m³',m:350,c:'#f97316'},
+                ].map(pl=>(
+                  <div key={pl.k} className="theme-animate" style={{background:D?'#1a1a18':'#f8fafc',border:`1px solid ${D?'rgba(255,255,255,.05)':'rgba(0,0,0,.04)'}`,borderRadius:16,padding:'16px 18px',display:'flex',flexDirection:'column'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:8}}>
+                      <div style={{width:8,height:8,borderRadius:'50%',background:pl.c,boxShadow:`0 0 8px ${pl.c}88`}}/>
+                      <span style={{fontSize:13,fontWeight:700,color:T.sub}}>{pl.k}</span>
+                    </div>
+                    <div style={{fontSize:24,fontWeight:900,color:T.text,marginBottom:14,lineHeight:1,letterSpacing:'-0.02em'}}>
+                      {typeof pl.v==='number'?pl.v.toFixed(1):pl.v} <span style={{fontSize:11,fontWeight:600,color:T.sub,marginLeft:2}}>{pl.u}</span>
+                    </div>
+                    <div style={{height:6,borderRadius:8,background:D?'rgba(255,255,255,.06)':'rgba(0,0,0,.05)',overflow:'hidden',marginTop:'auto'}}>
+                      <div style={{height:'100%',borderRadius:8,width:bars?`${Math.min((pl.v/pl.m)*100,100)}%`:'0%',background:pl.c,transition:'width 1.4s cubic-bezier(.22,1,.36,1)'}}/>
+                    </div>
+                  </div>
+                ))}
               </div>
-            )):(
+            ):(
               <div style={{textAlign:'center',padding:'60px 0',color:T.sub}}>
                 <Eye size={28} color={T.mut} style={{margin:'0 auto 8px'}}/>
                 <div style={{fontSize:13}}>Scan a location to view data</div>
