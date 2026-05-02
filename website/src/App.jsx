@@ -1,0 +1,237 @@
+import { useState, useEffect, useMemo, useRef } from "react";
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+gsap.registerPlugin(ScrollTrigger);
+import { getLocations, predictAuto, predictManual } from "./api";
+import HeroBackground from "./WindmillScene";
+import { getAqiTheme, getTimeInfo } from "./themes";
+import SearchSelect from "./SearchSelect";
+import { Wind,Droplets,MapPin,Search,Leaf,Sun,Cloud,CloudRain,Skull,AlertCircle,TrendingUp,Zap,Sunset,Moon,Activity,Shield,Clock,Pencil,Radio,Sunrise,CloudSun,ExternalLink,Database,Cpu,BarChart3,Users,Heart,Eye,Sparkles } from "lucide-react";
+
+const LEVELS=[{max:50,label:"Good",color:"#22c55e",I:Leaf},{max:100,label:"Satisfactory",color:"#eab308",I:Sun},{max:200,label:"Moderate",color:"#f97316",I:Cloud},{max:300,label:"Poor",color:"#ef4444",I:CloudRain},{max:400,label:"Very Poor",color:"#a855f7",I:Skull},{max:500,label:"Severe",color:"#dc2626",I:AlertCircle}];
+const getLevel=a=>LEVELS.find(l=>a<=l.max)||LEVELS[5];
+const TIME={'Good Morning':{I:Sunrise,s:"Fresh air awaits you"},'Good Afternoon':{I:CloudSun,s:"Stay mindful of the air"},'Good Evening':{I:Sunset,s:"Wind down, breathe easy"},'Good Night':{I:Moon,s:"Rest well tonight"}};
+const FIELDS=[{k:'pm25',l:'PM2.5',u:'µg/m³'},{k:'pm10',l:'PM10',u:'µg/m³'},{k:'no2',l:'NO₂',u:'ppb'},{k:'so2',l:'SO₂',u:'ppb'},{k:'co',l:'CO',u:'mg/m³'},{k:'o3',l:'O₃',u:'ppb'},{k:'temp',l:'Temp',u:'°C'},{k:'humidity',l:'Humidity',u:'%'}];
+
+function Gauge({aqi,color,dark}){
+  const r=70,cx=85,cy=85,c=Math.PI*r,p=Math.min(aqi/500,1),d=p*c;
+  return(
+    <svg width="170" height="105" viewBox="0 0 170 105" style={{overflow:'visible'}}>
+      <defs><linearGradient id="gg" x1="0%" y1="0%" x2="100%"><stop offset="0%" stopColor="#22c55e"/><stop offset="35%" stopColor="#eab308"/><stop offset="65%" stopColor="#f97316"/><stop offset="100%" stopColor="#ef4444"/></linearGradient></defs>
+      <path d={`M${cx-r} ${cy} A${r} ${r} 0 0 1 ${cx+r} ${cy}`} fill="none" stroke={dark?"rgba(255,255,255,.08)":"rgba(0,0,0,.06)"} strokeWidth="6" strokeLinecap="round"/>
+      <path d={`M${cx-r} ${cy} A${r} ${r} 0 0 1 ${cx+r} ${cy}`} fill="none" stroke="url(#gg)" strokeWidth="6" strokeLinecap="round" strokeDasharray={`${d} ${c}`} style={{transition:'stroke-dasharray 1.5s cubic-bezier(.22,1,.36,1)'}}/>
+      {(()=>{const a=Math.PI*(1-p),nx=cx+(r-8)*Math.cos(a),ny=cy-(r-8)*Math.sin(a);return<line x1={cx} y1={cy} x2={nx} y2={ny} stroke={color} strokeWidth="2" strokeLinecap="round" style={{transition:'all 1.5s'}}/>})()}
+      <circle cx={cx} cy={cy} r="3" fill={color}/>
+      {["0","250","500"].map((l,i)=>{const t=i/2,a=Math.PI*(1-t);return<text key={i} x={cx+(r+14)*Math.cos(a)} y={cy-(r+14)*Math.sin(a)+3} textAnchor="middle" fill={dark?"rgba(255,255,255,.2)":"rgba(0,0,0,.2)"} fontSize="8" fontFamily="Inter">{l}</text>})}
+    </svg>
+  );
+}
+
+export default function App(){
+  const time=useMemo(getTimeInfo,[]);const TI=TIME[time.greeting];
+  const[dark,setDark]=useState(false);const D=dark;
+  const[districts,setDistricts]=useState([]);const[locMap,setLocMap]=useState({});
+  const[district,setDistrict]=useState('');const[location,setLocation]=useState('');
+  const[result,setResult]=useState(null);const[loading,setLoading]=useState(false);
+  const[error,setError]=useState(null);const[bars,setBars]=useState(false);
+  const[mode,setMode]=useState('auto');
+  const[manual,setManual]=useState({pm25:'',pm10:'',no2:'',so2:'',co:'',o3:'',temp:'',humidity:''});
+
+  useEffect(()=>{getLocations().then(d=>{setDistricts(d.districts);setLocMap(d.locations);if(d.districts.length){setDistrict(d.districts[0]);setLocation(d.locations[d.districts[0]]?.[0]||'')}}).catch(()=>setError('Backend offline'))},[]);
+  useEffect(()=>{if(district&&locMap[district])setLocation(locMap[district][0])},[district]);
+  useEffect(()=>{setResult(null);setBars(false)},[district,location]);
+  const scan=async()=>{setLoading(true);setError(null);setBars(false);try{let r;if(mode==='auto')r=await predictAuto(district,location);else{const n={};for(const k in manual)n[k]=parseFloat(manual[k])||0;r=await predictManual({...n,district,location})}setResult(r);setTimeout(()=>setBars(true),400)}catch{setError('Prediction failed')}setLoading(false)};
+
+  const aqi=result?.predicted_aqi??null;const lv=aqi!==null?getLevel(aqi):null;const LI=lv?.I||Shield;
+  const theme=getAqiTheme(aqi);const p=result?.parameters;
+  const T=D?{bg:'#000000',card:'#111110',cb:'rgba(255,255,255,.08)',text:'#f0ece4',sub:'#a09888',mut:'#6c665d',acc:'#d4a574',inp:'#1a1a18',inpB:'rgba(255,255,255,.10)',div:'rgba(255,255,255,.06)'}
+    :{bg:'#ffffff',card:'#f5f0e8',cb:'rgba(0,0,0,.06)',text:'#1a1510',sub:'#7a6b5d',mut:'#b8a898',acc:'#b8860b',inp:'#efe9df',inpB:'rgba(0,0,0,.08)',div:'rgba(0,0,0,.06)'};
+  const CS={background:T.card,border:`1px solid ${T.cb}`,borderRadius:20,boxShadow:D?'0 2px 16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.03)':'0 2px 8px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.04)'};
+  const LB={fontSize:11,color:T.sub,letterSpacing:'.1em',textTransform:'uppercase',fontWeight:700,marginBottom:10};
+  const mainRef=useRef(null);
+
+  // GSAP scroll animations
+  useEffect(()=>{
+    const ctx=gsap.context(()=>{
+      gsap.utils.toArray('.gsap-fade').forEach(el=>{
+        gsap.from(el,{y:40,opacity:0,duration:.8,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 85%',toggleActions:'play none none none'}});
+      });
+    },mainRef);
+    return()=>ctx.revert();
+  },[]);
+
+  return(
+    <div ref={mainRef} style={{background:T.bg,minHeight:'100vh',fontFamily:"'Inter',sans-serif",color:T.text,transition:'all .3s','--bg':T.bg}}>
+
+      {/* ═══ HERO — Xurya style ═══ */}
+      <div style={{padding:16,position:'relative',marginBottom:48}}>
+        {/* Landscape container — full width, rounded */}
+        <div className="hero-landscape" style={{position:'relative',height:'80vh',minHeight:520,borderRadius:24,overflow:'hidden'}}>
+          <HeroBackground isNight={time.isNight}/>
+
+          {/* Dark overlay for text readability */}
+          <div style={{position:'absolute',inset:0,background:'linear-gradient(to top, rgba(0,0,0,.45) 0%, rgba(0,0,0,.1) 40%, transparent 70%)',zIndex:5}}/>
+
+          {/* Nav on top of landscape */}
+          <div style={{position:'absolute',top:0,left:0,right:0,zIndex:15,padding:'20px 32px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <div style={{width:32,height:32,borderRadius:8,background:'rgba(255,255,255,.15)',backdropFilter:'blur(8px)',display:'flex',alignItems:'center',justifyContent:'center'}}><Leaf size={15} color="#fff"/></div>
+              <span style={{fontSize:15,fontWeight:800,color:'#fff'}}>EnviroPredict</span>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:12}}>
+              <span style={{fontSize:12,color:'rgba(255,255,255,.6)',display:'flex',alignItems:'center',gap:4}}><Clock size={12}/>{new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
+              <button onClick={()=>setDark(!D)} style={{width:34,height:20,borderRadius:10,border:'1px solid rgba(255,255,255,.2)',background:'rgba(255,255,255,.1)',cursor:'pointer',position:'relative',padding:0,backdropFilter:'blur(4px)'}}>
+                <div style={{width:14,height:14,borderRadius:7,background:D?'#fbbf24':'#fff',position:'absolute',top:2,left:D?17:2,transition:'all .3s',boxShadow:'0 1px 2px rgba(0,0,0,.2)'}}/>
+              </button>
+            </div>
+          </div>
+
+          {/* Big text — bottom left */}
+          <div className="hero-text-block" style={{position:'absolute',bottom:56,left:48,zIndex:10,maxWidth:540}}>
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:12}}>
+              <TI.I size={16} color="rgba(255,255,255,.7)"/>
+              <span style={{fontSize:13,color:'rgba(255,255,255,.7)',fontWeight:600,letterSpacing:'.02em'}}>{time.greeting} · Real-time AQI Prediction</span>
+            </div>
+            <div className="hero-title" style={{fontSize:54,fontWeight:900,color:'#fff',lineHeight:1.08,letterSpacing:'-0.025em',textShadow:'0 2px 20px rgba(0,0,0,.3)'}}>
+              Clean Air<br/>for Odisha<span style={{color:'#d4a574'}}>.</span>
+            </div>
+            <div style={{display:'flex',gap:14,marginTop:24}}>
+              <button onClick={()=>document.getElementById('scan-section')?.scrollIntoView({behavior:'smooth'})} style={{padding:'11px 26px',borderRadius:99,border:'none',background:'#fff',color:'#1a1510',fontSize:13,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',gap:6,fontFamily:"'Inter'",boxShadow:'0 4px 16px rgba(0,0,0,.15)'}}><Search size={14}/>Scan Now</button>
+              <button onClick={()=>document.getElementById('features')?.scrollIntoView({behavior:'smooth'})} style={{padding:'11px 26px',borderRadius:99,border:'1px solid rgba(255,255,255,.3)',background:'rgba(255,255,255,.08)',color:'#fff',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:"'Inter'",backdropFilter:'blur(4px)'}}>Our Features</button>
+            </div>
+          </div>
+
+          {/* Floating Gauge Card — LEFT side */}
+          <div className="hero-gauge-float" style={{position:'absolute',top:80,left:32,zIndex:10,width:260,background:'rgba(0,0,0,.25)',backdropFilter:'blur(24px)',border:'1px solid rgba(255,255,255,.15)',borderRadius:20,padding:20,color:'#fff',boxShadow:'0 8px 32px rgba(0,0,0,.2)'}}>
+            <div style={{textAlign:'center'}}>
+              <Gauge aqi={aqi??0} color={lv?.color||'rgba(255,255,255,.3)'} dark={true}/>
+              <div style={{fontSize:44,fontWeight:900,color:lv?.color||'rgba(255,255,255,.3)',lineHeight:1,marginTop:-2}}>{aqi??'--'}</div>
+              <div style={{fontSize:9,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.5)',fontWeight:700,marginTop:6}}>Air Quality Index</div>
+            </div>
+            {lv&&<div style={{marginTop:10,paddingTop:10,borderTop:'1px solid rgba(255,255,255,.1)',display:'flex',alignItems:'center',gap:6}}>
+              <LI size={13} color={lv.color}/><span style={{fontSize:12,fontWeight:700,color:lv.color}}>{lv.label}</span>
+              <span style={{fontSize:11,color:'rgba(255,255,255,.5)',marginLeft:'auto',display:'flex',alignItems:'center',gap:3}}><MapPin size={10}/>{result?.location}</span>
+            </div>}
+          </div>
+        </div>
+
+        {/* Stats bar — bottom right, overlapping */}
+        <div className="stats-bar" style={{position:'absolute',bottom:-28,right:32,zIndex:20,...CS,padding:'22px 36px',display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:28,minWidth:480}}>
+          {[{v:'98.83%',l:'Model Accuracy',c:T.acc},{v:'400+',l:'Locations Covered',c:'#3b82f6'},{v:'9',l:'Districts in Odisha',c:'#22c55e'}].map(s=>(
+            <div key={s.l} style={{textAlign:'center'}}>
+              <div style={{fontSize:28,fontWeight:900,color:s.c}}>{s.v}</div>
+              <div style={{fontSize:11,color:T.sub,marginTop:2}}>{s.l}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ═══ DASHBOARD BELOW ═══ */}
+      <div id="scan-section" className="scan-section" style={{padding:'60px 32px 0',maxWidth:'100%'}}>
+
+        {/* ── 3-COLUMN LAYOUT: Scan | Pollutants | Gauge ── */}
+        <div className="gsap-fade dashboard-grid" style={{display:'grid',gridTemplateColumns:'300px 1fr 320px',gap:16,marginBottom:20}}>
+
+          {/* COL 1: Scan Controls */}
+          <div style={{...CS,padding:22}}>
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}><Search size={15} color={T.acc}/><span style={{fontSize:15,fontWeight:800}}>Scan</span></div>
+            <div style={{display:'flex',background:D?'#252523':'#f0ebe4',borderRadius:10,padding:3,gap:2,marginBottom:12}}>
+              <button onClick={()=>setMode('auto')} style={{flex:1,padding:'8px 0',borderRadius:8,border:'none',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:"'Inter'",display:'flex',alignItems:'center',justifyContent:'center',gap:4,background:mode==='auto'?T.card:'transparent',color:mode==='auto'?T.text:T.sub,boxShadow:mode==='auto'&&!D?'0 1px 3px rgba(0,0,0,.05)':'none'}}><Radio size={11}/>Auto</button>
+              <button onClick={()=>setMode('manual')} style={{flex:1,padding:'8px 0',borderRadius:8,border:'none',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:"'Inter'",display:'flex',alignItems:'center',justifyContent:'center',gap:4,background:mode==='manual'?T.card:'transparent',color:mode==='manual'?T.text:T.sub,boxShadow:mode==='manual'&&!D?'0 1px 3px rgba(0,0,0,.05)':'none'}}><Pencil size={11}/>Manual</button>
+            </div>
+            <SearchSelect label="District" value={district} options={districts} onChange={setDistrict} placeholder="Search..." dark={D}/>
+            <SearchSelect label="Location" value={location} options={locMap[district]||[]} onChange={setLocation} placeholder="Search..." dark={D}/>
+            {mode==='manual'&&<div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:5,marginBottom:10}}>{FIELDS.map(f=><div key={f.k}><div style={{fontSize:8,color:T.sub,letterSpacing:'.06em',textTransform:'uppercase',fontWeight:700,marginBottom:2}}>{f.l}</div><input type="number" step="any" placeholder="0" value={manual[f.k]} onChange={e=>setManual(p=>({...p,[f.k]:e.target.value}))} style={{width:'100%',background:T.inp,border:`1.5px solid ${T.inpB}`,borderRadius:8,padding:'6px 8px',fontSize:11,fontFamily:"'Inter'",color:T.text,outline:'none'}}/></div>)}</div>}
+            {error&&<div style={{background:'rgba(239,68,68,.06)',borderRadius:8,padding:'6px 8px',marginBottom:8,fontSize:10,color:'#ef4444',display:'flex',alignItems:'center',gap:4}}><AlertCircle size={11}/>{error}</div>}
+            <button onClick={scan} disabled={loading||!districts.length} style={{width:'100%',padding:13,borderRadius:12,border:'none',background:`linear-gradient(135deg,${T.acc},#d4a574)`,color:'#fff',fontSize:14,fontWeight:800,cursor:'pointer',fontFamily:"'Inter'",opacity:loading?.5:1}}>{loading?'Scanning...':'Scan Air Quality'}</button>
+          </div>
+
+          {/* COL 2: Pollutant Breakdown */}
+          <div style={{...CS,padding:24}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
+              <div style={{...LB,fontSize:12}}>Pollutant Breakdown</div>
+              {p&&<span style={{fontSize:10,fontWeight:700,color:'#22c55e',background:'rgba(34,197,94,.08)',padding:'3px 10px',borderRadius:99}}>● LIVE</span>}
+            </div>
+            {p?[
+              {k:'PM2.5',v:p.pm25,u:'µg/m³',m:250,c:'#22c55e'},
+              {k:'PM10',v:p.pm10,u:'µg/m³',m:430,c:'#3b82f6'},
+              {k:'O₃',v:p.o3,u:'µg/m³',m:200,c:'#eab308'},
+              {k:'NO₂',v:p.no2,u:'µg/m³',m:200,c:'#f472b6'},
+              {k:'CO',v:p.co,u:'mg/m³',m:10,c:'#a78bfa'},
+              {k:'SO₂',v:p.so2,u:'µg/m³',m:350,c:'#f97316'},
+            ].map(pl=>(
+              <div key={pl.k} style={{marginBottom:16}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:5}}>
+                  <span style={{fontSize:15,fontWeight:700}}>{pl.k}</span>
+                  <span style={{fontSize:18,fontWeight:900,color:pl.c}}>{typeof pl.v==='number'?pl.v.toFixed(1):pl.v} <span style={{fontSize:11,color:T.sub,fontWeight:500}}>{pl.u}</span></span>
+                </div>
+                <div style={{height:5,borderRadius:99,background:D?'rgba(255,255,255,.08)':'rgba(0,0,0,.06)',overflow:'hidden'}}>
+                  <div style={{height:'100%',borderRadius:99,width:bars?`${Math.min((pl.v/pl.m)*100,100)}%`:'0%',background:`linear-gradient(90deg, ${pl.c}, ${pl.c}cc)`,transition:'width 1.4s cubic-bezier(.22,1,.36,1)'}}/>
+                </div>
+              </div>
+            )):(
+              <div style={{textAlign:'center',padding:'60px 0',color:T.sub}}>
+                <Eye size={28} color={T.mut} style={{margin:'0 auto 8px'}}/>
+                <div style={{fontSize:13}}>Scan a location to view data</div>
+              </div>
+            )}
+          </div>
+
+          {/* COL 3: AQI Gauge Meter */}
+          <div style={{...CS,padding:24,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
+            <Gauge aqi={aqi??0} color={lv?.color||T.mut} dark={D}/>
+            <div style={{fontSize:56,fontWeight:900,color:lv?.color||T.mut,lineHeight:1,marginTop:4}}>{aqi??'--'}</div>
+            <div style={{fontSize:11,letterSpacing:'.12em',textTransform:'uppercase',color:T.sub,fontWeight:700,marginTop:8}}>Air Quality Index</div>
+            {lv&&<span style={{display:'inline-flex',alignItems:'center',gap:5,padding:'5px 14px',borderRadius:99,fontSize:12,fontWeight:700,color:lv.color,background:`${lv.color}10`,marginTop:12}}><LI size={13}/>{lv.label}</span>}
+            {result&&<div style={{display:'flex',alignItems:'center',gap:4,fontSize:12,color:T.sub,marginTop:8}}><MapPin size={12}/>{result.location}, {result.district}</div>}
+            <div style={{width:'100%',marginTop:16,paddingTop:12,borderTop:`1px solid ${T.div}`}}>
+              <div style={{display:'flex',justifyContent:'space-between'}}>
+                {LEVELS.map(l=>{const on=aqi!==null&&aqi<=l.max&&(LEVELS.indexOf(l)===0||aqi>LEVELS[LEVELS.indexOf(l)-1].max);return(
+                  <div key={l.label} style={{textAlign:'center',flex:1}}>
+                    <div style={{width:'100%',height:4,borderRadius:99,background:on?l.color:(D?'rgba(255,255,255,.05)':'rgba(0,0,0,.04)'),transition:'background .5s',marginBottom:3}}/>
+                    <div style={{fontSize:7,color:on?l.color:T.mut,fontWeight:on?800:500}}>{l.label}</div>
+                  </div>
+                )})}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Health Tips */}
+        {aqi!==null&&<div className="health-grid" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:14,marginBottom:20}}>
+          {[{I:Activity,t:'Outdoor Activity',tip:aqi<100?'Great for sports & jogging.':'Limit prolonged outdoor exertion.',c:'#22c55e'},{I:Shield,t:'Protection',tip:aqi<100?'No mask needed today.':'N95 mask recommended outdoors.',c:'#3b82f6'},{I:Wind,t:'Ventilation',tip:aqi<100?'Open windows for fresh air.':'Keep windows closed. Use purifiers.',c:'#eab308'}].map(h=>(
+            <div key={h.t} style={{...CS,padding:20,display:'flex',alignItems:'center',gap:14}}>
+              <div style={{width:40,height:40,borderRadius:12,background:`${h.c}0A`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><h.I size={18} color={h.c}/></div>
+              <div><div style={{fontSize:14,fontWeight:800}}>{h.t}</div><div style={{fontSize:13,color:T.sub,lineHeight:1.5}}>{h.tip}</div></div>
+            </div>
+          ))}
+        </div>}
+
+        {/* Features */}
+        <div id="features" className="gsap-fade" style={{marginTop:32,marginBottom:20}}>
+          <div style={{textAlign:'center',marginBottom:24}}><div style={LB}>Why EnviroPredict</div><h2 style={{fontSize:30,fontWeight:900,margin:'4px 0'}}>Built for Precision</h2></div>
+          <div className="features-grid" style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:14}}>
+            {[{I:Cpu,t:'ML Powered',d:'XGBoost with 98.83% accuracy.',c:'#d4a574'},{I:Database,t:'Live Data',d:'Real-time from Open-Meteo API.',c:'#3b82f6'},{I:BarChart3,t:'6 Pollutants',d:'Complete pollutant analysis.',c:'#22c55e'},{I:Sparkles,t:'Smart UI',d:'Landscape reacts to AQI.',c:'#a855f7'}].map(f=>(
+              <div key={f.t} style={{...CS,padding:22,textAlign:'center'}}>
+                <div style={{width:44,height:44,borderRadius:12,background:`${f.c}12`,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 12px'}}><f.I size={20} color={f.c}/></div>
+                <div style={{fontSize:15,fontWeight:800,marginBottom:4}}>{f.t}</div><div style={{fontSize:13,color:T.sub,lineHeight:1.5}}>{f.d}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Tech + Team */}
+        <div className="gsap-fade tech-team-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:20}}>
+          <div style={{...CS,padding:24}}><div style={LB}>Tech Stack</div><div style={{display:'flex',flexWrap:'wrap',gap:8}}>{['XGBoost','FastAPI','React','Vite','Tailwind','scikit-learn','Open-Meteo','Lucide'].map(t=><span key={t} style={{background:D?'#252523':T.inp,border:`1px solid ${T.cb}`,borderRadius:99,padding:'6px 14px',fontSize:12,fontWeight:600,color:T.sub}}>{t}</span>)}</div></div>
+          <div style={{...CS,padding:24}}><div style={LB}>Team</div><div style={{display:'flex',gap:10,flexWrap:'wrap'}}>{[{n:'Shubhranshu Behera',r:'ML & Backend'},{n:'Rupak Ranjan Parida',r:'Frontend'},{n:'Ranjan Kumar Nayak',r:'Research'},{n:'Pramod Kumar Mohananta',r:'Data Analysis'}].map(m=><div key={m.n} style={{flex:'1 1 120px',background:D?'#1a1a18':T.inp,borderRadius:12,padding:'14px 10px',textAlign:'center'}}><div style={{width:36,height:36,borderRadius:'50%',background:`linear-gradient(135deg,${T.acc},#d4a574)`,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 8px'}}><Users size={15} color="#fff"/></div><div style={{fontSize:12,fontWeight:800}}>{m.n}</div><div style={{fontSize:10,color:T.sub,marginTop:2}}>{m.r}</div></div>)}</div></div>
+        </div>
+
+        <footer className="site-footer" style={{borderTop:`1px solid ${T.div}`,padding:'18px 0 22px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <div style={{display:'flex',alignItems:'center',gap:6}}><Leaf size={15} color={T.acc}/><span style={{fontSize:14,fontWeight:800}}>EnviroPredict</span></div>
+          <p style={{fontSize:12,color:T.mut}}>AQI Prediction · XGBoost + FastAPI</p>
+          <p style={{fontSize:11,color:T.mut,display:'flex',alignItems:'center',gap:4}}><Heart size={10}/>Built with care</p>
+        </footer>
+      </div>
+    </div>
+  );
+}

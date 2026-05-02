@@ -9,6 +9,20 @@ import numpy as np
 import os
 import sys
 import joblib
+import random
+from datetime import datetime
+
+try:
+    import requests
+    HAS_REQUESTS = True
+except ImportError:
+    HAS_REQUESTS = False
+
+try:
+    from geopy.geocoders import Nominatim
+    HAS_GEOPY = True
+except ImportError:
+    HAS_GEOPY = False
 
 # ─── Paths ───────────────────────────────────────────────────────────────────
 
@@ -398,6 +412,22 @@ LOCATION_DISTRICT = {
 
 LOCATIONS = sorted(LOCATION_DISTRICT.keys())
 
+# ─── Realistic parameter ranges per district (from dataset analysis) ─────────
+# Format: { 'District': { 'param': (min, max), ... } }
+DISTRICT_PARAM_RANGES = {
+    'Kalahandi':  {'pm25': (5, 55),  'pm10': (10, 135), 'no2': (2, 56),  'so2': (1, 26),  'co': (0.2, 1.9), 'o3': (5, 90),  'temp': (15, 28), 'humidity': (35, 65)},
+    'Dhenkanal':  {'pm25': (5, 86),  'pm10': (10, 147), 'no2': (2, 63),  'so2': (1, 38),  'co': (0.2, 2.7), 'o3': (5, 82),  'temp': (15, 28), 'humidity': (35, 65)},
+    'Keonjhar':   {'pm25': (6, 98),  'pm10': (10, 171), 'no2': (2, 38),  'so2': (1, 12),  'co': (0.2, 1.2), 'o3': (5, 42),  'temp': (16, 26), 'humidity': (40, 62)},
+    'Khordha':    {'pm25': (5, 75),  'pm10': (10, 106), 'no2': (2, 49),  'so2': (1, 36),  'co': (0.2, 3.7), 'o3': (5, 63),  'temp': (16, 26), 'humidity': (35, 60)},
+    'Jajpur':     {'pm25': (5, 59),  'pm10': (10, 120), 'no2': (2, 42),  'so2': (1, 23),  'co': (0.2, 2.6), 'o3': (5, 84),  'temp': (16, 27), 'humidity': (35, 64)},
+    'Cuttack':    {'pm25': (10, 60), 'pm10': (20, 110), 'no2': (5, 45),  'so2': (2, 20),  'co': (0.3, 2.0), 'o3': (5, 50),  'temp': (17, 27), 'humidity': (40, 65)},
+    'Sundargarh': {'pm25': (10, 50), 'pm10': (20, 100), 'no2': (10, 45), 'so2': (5, 20),  'co': (0.5, 2.0), 'o3': (10, 55), 'temp': (18, 27), 'humidity': (38, 58)},
+    'Ganjam':     {'pm25': (12, 92), 'pm10': (16, 164), 'no2': (4, 94),  'so2': (1, 14),  'co': (0.2, 3.6), 'o3': (5, 62),  'temp': (17, 27), 'humidity': (36, 57)},
+    'Sambalpur':  {'pm25': (10, 55), 'pm10': (18, 100), 'no2': (5, 40),  'so2': (2, 18),  'co': (0.3, 1.8), 'o3': (8, 50),  'temp': (18, 28), 'humidity': (38, 60)},
+}
+# Default fallback for unknown districts
+DEFAULT_PARAM_RANGE = {'pm25': (5, 60), 'pm10': (10, 120), 'no2': (2, 50), 'so2': (1, 20), 'co': (0.2, 2.0), 'o3': (5, 60), 'temp': (17, 27), 'humidity': (38, 62)}
+
 
 def get_aqi_category(aqi):
     """Get AQI category and emoji from AQI value."""
@@ -405,6 +435,79 @@ def get_aqi_category(aqi):
         if low <= aqi <= high:
             return category, emoji
     return 'Severe', '⚫'
+
+
+def generate_random_params(district):
+    """Generate realistic random parameters based on district-level ranges from the dataset."""
+    ranges = DISTRICT_PARAM_RANGES.get(district, DEFAULT_PARAM_RANGE)
+    params = {}
+    for key, (lo, hi) in ranges.items():
+        if key == 'co':
+            params[key] = round(random.uniform(lo, hi), 2)
+        elif key in ('temp', 'humidity'):
+            params[key] = round(random.uniform(lo, hi), 1)
+        else:
+            params[key] = round(random.uniform(lo, hi), 1)
+    return params
+
+
+def fetch_live_params(location, district):
+    """Fetch live air quality and weather data from Open-Meteo API.
+    Returns a dict of parameters or None if fetching fails."""
+    if not HAS_REQUESTS or not HAS_GEOPY:
+        return None
+
+    try:
+        geolocator = Nominatim(user_agent="aqi_predictor_odisha_cli")
+        query = f"{location}, {district}, Odisha, India"
+        loc = geolocator.geocode(query, timeout=10)
+        if not loc:
+            loc = geolocator.geocode(f"{district}, Odisha, India", timeout=10)
+        if not loc:
+            return None
+
+        lat, lon = loc.latitude, loc.longitude
+
+        # Air Quality API
+        aq_url = f"https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&current=pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone"
+        # Weather API
+        weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m"
+
+        aq_res = requests.get(aq_url, timeout=10).json()
+        weather_res = requests.get(weather_url, timeout=10).json()
+
+        if "current" not in aq_res or "current" not in weather_res:
+            return None
+
+        aq = aq_res["current"]
+        w = weather_res["current"]
+
+        pm25 = aq.get("pm2_5", 0) or 0
+        pm10 = aq.get("pm10", 0) or 0
+        co_ug = aq.get("carbon_monoxide", 0) or 0
+        no2_ug = aq.get("nitrogen_dioxide", 0) or 0
+        so2_ug = aq.get("sulphur_dioxide", 0) or 0
+        o3_ug = aq.get("ozone", 0) or 0
+
+        # Unit conversions (ug/m3 to model units)
+        co = co_ug / 1000.0        # mg/m3
+        no2 = (no2_ug * 24.45 / 46.01) if no2_ug else 0.0  # ppb
+        so2 = (so2_ug * 24.45 / 64.06) if so2_ug else 0.0  # ppb
+        o3 = (o3_ug * 24.45 / 48.00) if o3_ug else 0.0     # ppb
+
+        return {
+            'pm25': round(pm25, 2),
+            'pm10': round(pm10, 2),
+            'no2': round(no2, 2),
+            'so2': round(so2, 2),
+            'co': round(co, 2),
+            'o3': round(o3, 2),
+            'temp': w.get("temperature_2m", 25.0),
+            'humidity': w.get("relative_humidity_2m", 50.0),
+            'coordinates': {'lat': lat, 'lon': lon}
+        }
+    except Exception:
+        return None
 
 
 def load_model():
@@ -419,7 +522,7 @@ def load_model():
     le_district = joblib.load(DISTRICT_ENCODER_PATH)
     feature_cols = joblib.load(FEATURES_PATH)
 
-    print("  ✅ Model loaded successfully!")
+    print("  [OK] Model loaded successfully!")
     return model, le, le_district, feature_cols
 
 
@@ -428,10 +531,10 @@ def interactive_prediction(model, le, le_district, feature_cols):
     print("\n" + "=" * 60)
     print("  AQI PREDICTION - Interactive Mode")
     print("=" * 60)
-    print("  Flow: District → Location → Parameters → Prediction")
+    print("  Flow: District -> Location -> Mode -> Prediction")
     print("  Type 'quit' or 'q' at any prompt to exit.\n")
 
-    # Build district → locations mapping
+    # Build district -> locations mapping
     district_locations = {}
     for loc, dist in LOCATION_DISTRICT.items():
         district_locations.setdefault(dist, []).append(loc)
@@ -443,14 +546,14 @@ def interactive_prediction(model, le, le_district, feature_cols):
     while True:
         print("-" * 60)
         try:
-            # ── STEP 1: Select District ──────────────────────────
-            print("\n  ┌─ STEP 1: Select District")
-            print("  │")
+            # -- STEP 1: Select District --
+            print("\n  +-- STEP 1: Select District")
+            print("  |")
             for i, dist in enumerate(districts, 1):
                 count = len(district_locations[dist])
-                print(f"  │  {i:2d}. {dist:<15s} ({count} locations)")
-            print("  │")
-            dist_input = input("  └─ Enter district number (or name): ").strip()
+                print(f"  |  {i:2d}. {dist:<15s} ({count} locations)")
+            print("  |")
+            dist_input = input("  +-- Enter district number (or name): ").strip()
 
             if dist_input.lower() in ('quit', 'q', 'exit'):
                 break
@@ -461,22 +564,22 @@ def interactive_prediction(model, le, le_district, feature_cols):
                 if 0 <= dist_idx < len(districts):
                     district = districts[dist_idx]
                 else:
-                    print("  ❌ Invalid district number!")
+                    print("  [!] Invalid district number!")
                     continue
             else:
                 district = dist_input.title()
                 if district not in districts:
-                    print(f"  ❌ Unknown district: {district}")
+                    print(f"  [!] Unknown district: {district}")
                     continue
 
-            # ── STEP 2: Select Location ──────────────────────────
+            # -- STEP 2: Select Location --
             locs = district_locations[district]
-            print(f"\n  ┌─ STEP 2: Select Location in {district}")
-            print("  │")
+            print(f"\n  +-- STEP 2: Select Location in {district}")
+            print("  |")
             for i, loc in enumerate(locs, 1):
-                print(f"  │  {i:2d}. {loc}")
-            print("  │")
-            loc_input = input("  └─ Enter location number (or name): ").strip()
+                print(f"  |  {i:2d}. {loc}")
+            print("  |")
+            loc_input = input("  +-- Enter location number (or name): ").strip()
 
             if loc_input.lower() in ('quit', 'q', 'exit'):
                 break
@@ -486,31 +589,89 @@ def interactive_prediction(model, le, le_district, feature_cols):
                 if 0 <= loc_idx < len(locs):
                     location = locs[loc_idx]
                 else:
-                    print("  ❌ Invalid location number!")
+                    print("  [!] Invalid location number!")
                     continue
             else:
                 location = loc_input.title()
                 if location not in locs:
-                    print(f"  ❌ '{location}' not found in {district}!")
+                    print(f"  [!] '{location}' not found in {district}!")
                     continue
 
-            # ── STEP 3: Enter Parameters ─────────────────────────
-            print(f"\n  ┌─ STEP 3: Enter Parameters for {location}, {district}")
-            print("  │")
-            pm25 = float(input("  │  PM2.5 (µg/m³)   : "))
-            pm10 = float(input("  │  PM10  (µg/m³)   : "))
-            no2  = float(input("  │  NO2   (ppb)     : "))
-            so2  = float(input("  │  SO2   (ppb)     : "))
-            co   = float(input("  │  CO    (mg/m³)   : "))
-            o3   = float(input("  │  O3    (ppb)     : "))
-            temp = float(input("  │  Temperature (°C): "))
-            hum  = float(input("  │  Humidity (%)    : "))
-            month = int(input("  │  Month (1-12)    : "))
-            year  = int(input("  │  Year (e.g. 2025): "))
-            print("  │")
+            # -- STEP 3: Choose Parameter Mode --
+            print(f"\n  +-- STEP 3: Parameter Mode for {location}, {district}")
+            print("  |")
+            print("  |  1. AUTO  - Fetch live data")
+            print("  |  2. MANUAL - Enter all parameters yourself")
+            print("  |")
+            mode_input = input("  +-- Choose mode [1/2] (default=1): ").strip()
 
-            # Calculate day of year (approximate)
-            from datetime import datetime
+            if mode_input.lower() in ('quit', 'q', 'exit'):
+                break
+
+            use_auto = mode_input != '2'
+
+            now = datetime.now()
+            params = None
+            data_source = None
+
+            if use_auto:
+                # -- AUTO MODE --
+                print("\n  [*] Attempting to fetch live data...")
+                params = fetch_live_params(location, district)
+
+                if params:
+                    data_source = "LIVE (Open-Meteo API)"
+                    coords = params.pop('coordinates', None)
+                    print(f"  [OK] Live data fetched successfully!")
+                    if coords:
+                        print(f"  [*] Coordinates: {coords['lat']:.4f}, {coords['lon']:.4f}")
+                else:
+                    print("  [!] Could not fetch live data. Using realistic random values...")
+                    params = generate_random_params(district)
+                    data_source = f"RANDOM (based on {district} historical data)"
+                    print(f"  [OK] Random parameters generated for {district}.")
+
+                # Display the parameters being used
+                print("\n  Parameters used:")
+                print(f"    PM2.5 : {params['pm25']} ug/m3")
+                print(f"    PM10  : {params['pm10']} ug/m3")
+                print(f"    NO2   : {params['no2']} ppb")
+                print(f"    SO2   : {params['so2']} ppb")
+                print(f"    CO    : {params['co']} mg/m3")
+                print(f"    O3    : {params['o3']} ppb")
+                print(f"    Temp  : {params['temp']} C")
+                print(f"    Humid : {params['humidity']} %")
+                print(f"  Source: {data_source}")
+
+                pm25 = params['pm25']
+                pm10 = params['pm10']
+                no2 = params['no2']
+                so2 = params['so2']
+                co = params['co']
+                o3 = params['o3']
+                temp = params['temp']
+                hum = params['humidity']
+                month = now.month
+                year = now.year
+
+            else:
+                # -- MANUAL MODE --
+                print(f"\n  +-- Enter Parameters for {location}, {district}")
+                print("  |")
+                pm25 = float(input("  |  PM2.5 (ug/m3)   : "))
+                pm10 = float(input("  |  PM10  (ug/m3)   : "))
+                no2  = float(input("  |  NO2   (ppb)     : "))
+                so2  = float(input("  |  SO2   (ppb)     : "))
+                co   = float(input("  |  CO    (mg/m3)   : "))
+                o3   = float(input("  |  O3    (ppb)     : "))
+                temp = float(input("  |  Temperature (C) : "))
+                hum  = float(input("  |  Humidity (%)    : "))
+                month = int(input("  |  Month (1-12)    : "))
+                year  = int(input("  |  Year (e.g. 2025): "))
+                print("  |")
+                data_source = "MANUAL INPUT"
+
+            # Calculate day of year
             day_of_year = datetime(year, month, 15).timetuple().tm_yday
 
             # Encode location and district
@@ -518,7 +679,7 @@ def interactive_prediction(model, le, le_district, feature_cols):
                 loc_encoded = le.transform([location])[0]
                 dist_encoded = le_district.transform([district])[0]
             except ValueError:
-                print("  ❌ Location/District not recognized by encoder!")
+                print("  [!] Location/District not recognized by encoder!")
                 continue
 
             # Create feature array
@@ -533,17 +694,20 @@ def interactive_prediction(model, le, le_district, feature_cols):
             category, emoji = get_aqi_category(predicted_aqi)
 
             # Display result
-            print("  └─ PREDICTION RESULT")
             print("\n" + "=" * 60)
-            print(f"  📍 District  : {district}")
-            print(f"  📍 Location  : {location}")
-            print(f"  📅 Period    : {month}/{year}")
-            print(f"  🌡️  AQI      : {predicted_aqi}")
-            print(f"  {emoji} Category : {category}")
+            print("  PREDICTION RESULT")
+            print("=" * 60)
+            print(f"  District  : {district}")
+            print(f"  Location  : {location}")
+            print(f"  Period    : {month}/{year}")
+            print(f"  Data Src  : {data_source}")
+            print(f"  ---------------------------------")
+            print(f"  AQI       : {predicted_aqi}")
+            print(f"  Category  : {category} {emoji}")
             print("=" * 60)
 
         except ValueError:
-            print("  ❌ Invalid input! Please enter numeric values.")
+            print("  [!] Invalid input! Please enter numeric values.")
         except KeyboardInterrupt:
             print("\n\n  Exiting...")
             break
