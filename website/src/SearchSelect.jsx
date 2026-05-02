@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
-export default function SearchSelect({ label, value, options, onChange, placeholder, dark }) {
+export default function SearchSelect({ label, value, options, onChange, placeholder, dark, loading }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const ref = useRef(null);
@@ -14,9 +14,13 @@ export default function SearchSelect({ label, value, options, onChange, placehol
   return (
     <div ref={ref} style={{ position:"relative", marginBottom:14 }}>
       <div style={{ fontSize:10, color:dark?'#8c8578':'#8c7b6b', letterSpacing:".12em", textTransform:"uppercase", fontWeight:700, marginBottom:5 }}>{label}</div>
-      <div onClick={() => { setOpen(!open); setSearch(""); }} style={{ background:T.bg, border:`1.5px solid ${open?T.brA:T.br}`, borderRadius:12, padding:"11px 14px", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"space-between", transition:"all .2s", boxShadow:open?`0 0 0 3px ${T.brA}18`:"none" }}>
-        <span style={{ fontSize:14, fontWeight:600, color:value?T.text:T.sub }}>{value||placeholder}</span>
-        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style={{transform:open?"rotate(180deg)":"rotate(0)",transition:"transform .2s"}}><path d="M2 4L6 8L10 4" stroke={T.sub} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+      <div onClick={() => { if(!loading){ setOpen(!open); setSearch(""); } }} style={{ background:T.bg, border:`1.5px solid ${open?T.brA:T.br}`, borderRadius:12, padding:"11px 14px", cursor:loading?"default":"pointer", display:"flex", alignItems:"center", justifyContent:"space-between", transition:"all .2s", boxShadow:open?`0 0 0 3px ${T.brA}18`:"none", opacity:loading?0.6:1 }}>
+        <span style={{ fontSize:14, fontWeight:600, color:value?T.text:T.sub }}>{loading ? "Fetching..." : (value||placeholder)}</span>
+        {loading ? (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={T.sub} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{animation:'spin-anim 1s linear infinite'}}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+        ) : (
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style={{transform:open?"rotate(180deg)":"rotate(0)",transition:"transform .2s"}}><path d="M2 4L6 8L10 4" stroke={T.sub} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        )}
       </div>
       {open && (
         <div style={{ position:"absolute", top:"calc(100% + 4px)", left:0, right:0, zIndex:100, background:T.drop, border:`1px solid ${T.dropBr}`, borderRadius:14, overflow:"hidden", boxShadow:"0 10px 32px rgba(0,0,0,.1)", maxHeight:260 }}>

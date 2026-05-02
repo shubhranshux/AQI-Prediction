@@ -63,14 +63,19 @@ function Gauge({aqi,color,dark}){
 export default function App(){
   const time=useMemo(getTimeInfo,[]);const TI=TIME[time.greeting];
   const[dark,setDark]=useState(false);const D=dark;
-  const[districts,setDistricts]=useState([]);const[locMap,setLocMap]=useState({});
-  const[district,setDistrict]=useState('');const[location,setLocation]=useState('');
-  const[result,setResult]=useState(null);const[loading,setLoading]=useState(false);
-  const[error,setError]=useState(null);const[bars,setBars]=useState(false);
-  const[mode,setMode]=useState('auto');
-  const[manual,setManual]=useState({pm25:'',pm10:'',no2:'',so2:'',co:'',o3:'',temp:'',humidity:''});
+  const [districts,setDistricts]=useState([]);
+  const [locMap,setLocMap]=useState({});
+  const [district,setDistrict]=useState('');
+  const [location,setLocation]=useState('');
+  const [result,setResult]=useState(null);
+  const [loading,setLoading]=useState(false);
+  const [fetchingLocs,setFetchingLocs]=useState(true);
+  const [error,setError]=useState(null);
+  const [mode,setMode]=useState('auto'); // auto|manual
+  const [manual,setManual]=useState({pm25:'',pm10:'',no2:'',so2:'',co:'',o3:'',temp:'',humidity:''});
+  const [bars,setBars]=useState(false);
 
-  useEffect(()=>{getLocations().then(d=>{setDistricts(d.districts);setLocMap(d.locations);if(d.districts.length){setDistrict(d.districts[0]);setLocation(d.locations[d.districts[0]]?.[0]||'')}}).catch(()=>setError('Backend offline'))},[]);
+  useEffect(()=>{getLocations().then(d=>{setDistricts(d.districts);setLocMap(d.locations);if(d.districts.length){setDistrict(d.districts[0]);setLocation(d.locations[d.districts[0]]?.[0]||'')}setFetchingLocs(false)}).catch(()=>{setError('Backend offline');setFetchingLocs(false)})},[]);
   useEffect(()=>{if(district&&locMap[district])setLocation(locMap[district][0])},[district]);
   useEffect(()=>{setResult(null);setBars(false)},[district,location]);
   const scan=async()=>{setLoading(true);setError(null);setBars(false);try{let r;if(mode==='auto')r=await predictAuto(district,location);else{const n={};for(const k in manual)n[k]=parseFloat(manual[k])||0;r=await predictManual({...n,district,location})}setResult(r);setTimeout(()=>setBars(true),400)}catch{setError('Prediction failed')}setLoading(false)};
@@ -79,7 +84,7 @@ export default function App(){
   const theme=getAqiTheme(aqi);const p=result?.parameters;
   const T=D?{bg:'#000000',card:'#111110',cb:'rgba(255,255,255,.08)',text:'#f0ece4',sub:'#a09888',mut:'#6c665d',acc:'#d4a574',inp:'#1a1a18',inpB:'rgba(255,255,255,.10)',div:'rgba(255,255,255,.06)'}
     :{bg:'#f9f9fc',card:'#ffffff',cb:'rgba(0,0,0,.04)',text:'#111827',sub:'#6b7280',mut:'#9ca3af',acc:'#0f172a',inp:'#f3f4f6',inpB:'rgba(0,0,0,.05)',div:'rgba(0,0,0,.06)'};
-  const CS={transition:'background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.4s ease',background:T.card,border:`1px solid ${T.cb}`,borderRadius:24,boxShadow:D?'0 2px 16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.03)':'0 10px 30px rgba(0,0,0,.03), 0 1px 3px rgba(0,0,0,.02)'};
+  const CS={background:T.card,border:`1px solid ${T.cb}`,borderRadius:24,boxShadow:D?'0 2px 16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.03)':'0 10px 30px rgba(0,0,0,.03), 0 1px 3px rgba(0,0,0,.02)'};
   const LB={fontSize:11,color:T.sub,letterSpacing:'.08em',textTransform:'uppercase',fontWeight:700,marginBottom:12};
   const mainRef=useRef(null);
 
@@ -94,12 +99,12 @@ export default function App(){
   },[]);
 
   return(
-    <div ref={mainRef} style={{background:T.bg,minHeight:'100vh',fontFamily:"'Inter',sans-serif",color:T.text,transition:'all .3s','--bg':T.bg}}>
+    <div ref={mainRef} style={{background:T.bg,minHeight:'100vh',fontFamily:"'Inter',sans-serif",color:T.text,'--bg':T.bg}}>
 
       {/* ═══ HERO — Xurya style ═══ */}
       <div style={{padding:16,position:'relative',marginBottom:48}}>
         {/* Landscape container — full width, rounded */}
-        <div className="hero-landscape" style={{position:'relative',height:'80vh',minHeight:520,borderRadius:24,overflow:'hidden'}}>
+        <div className="hero-landscape" style={{position:'relative',height:'80vh',minHeight:520,borderRadius:24,overflow:'hidden',transform:'translateZ(0)',isolation:'isolate',WebkitMaskImage:'-webkit-radial-gradient(white, black)'}}>
           <HeroBackground isNight={time.isNight}/>
 
           {/* Dark overlay for text readability */}
@@ -159,11 +164,15 @@ export default function App(){
               <button onClick={()=>setMode('auto')} style={{flex:1,padding:'8px 0',borderRadius:8,border:'none',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:"'Inter'",display:'flex',alignItems:'center',justifyContent:'center',gap:4,background:mode==='auto'?T.card:'transparent',color:mode==='auto'?T.text:T.sub,boxShadow:mode==='auto'&&!D?'0 1px 3px rgba(0,0,0,.05)':'none'}}><Radio size={11}/>Auto</button>
               <button onClick={()=>setMode('manual')} style={{flex:1,padding:'8px 0',borderRadius:8,border:'none',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:"'Inter'",display:'flex',alignItems:'center',justifyContent:'center',gap:4,background:mode==='manual'?T.card:'transparent',color:mode==='manual'?T.text:T.sub,boxShadow:mode==='manual'&&!D?'0 1px 3px rgba(0,0,0,.05)':'none'}}><Pencil size={11}/>Manual</button>
             </div>
-            <SearchSelect label="District" value={district} options={districts} onChange={setDistrict} placeholder="Search..." dark={D}/>
-            <SearchSelect label="Location" value={location} options={locMap[district]||[]} onChange={setLocation} placeholder="Search..." dark={D}/>
+            <SearchSelect label="District" value={district} options={districts} onChange={setDistrict} placeholder="Search..." dark={D} loading={fetchingLocs}/>
+            <SearchSelect label="Location" value={location} options={locMap[district]||[]} onChange={setLocation} placeholder="Search..." dark={D} loading={fetchingLocs}/>
             {mode==='manual'&&<div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:5,marginBottom:10}}>{FIELDS.map(f=><div key={f.k}><div style={{fontSize:8,color:T.sub,letterSpacing:'.06em',textTransform:'uppercase',fontWeight:700,marginBottom:2}}>{f.l}</div><input type="number" step="any" placeholder="0" value={manual[f.k]} onChange={e=>setManual(p=>({...p,[f.k]:e.target.value}))} style={{width:'100%',background:T.inp,border:`1.5px solid ${T.inpB}`,borderRadius:8,padding:'6px 8px',fontSize:11,fontFamily:"'Inter'",color:T.text,outline:'none'}}/></div>)}</div>}
             {error&&<div style={{background:'rgba(239,68,68,.06)',borderRadius:8,padding:'6px 8px',marginBottom:8,fontSize:10,color:'#ef4444',display:'flex',alignItems:'center',gap:4}}><AlertCircle size={11}/>{error}</div>}
-            <button onClick={scan} disabled={loading||!districts.length} style={{width:'100%',padding:14,borderRadius:14,border:'none',background:T.acc,color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:"'Inter'",opacity:loading?.5:1,transition:'all .2s',boxShadow:'0 4px 12px rgba(15,23,42,.15)'}}>{loading?'Scanning...':'Scan Air Quality'}</button>
+            <button onClick={scan} disabled={loading||(!districts.length && !fetchingLocs)} style={{width:'100%',padding:14,borderRadius:14,border:'none',background:T.acc,color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:"'Inter'",opacity:(loading||fetchingLocs)?0.6:1,transition:'all .2s',boxShadow:'0 4px 12px rgba(15,23,42,.15)',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
+              {loading ? (
+                <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{animation:'spin-anim 1s linear infinite'}}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Scanning...</>
+              ) : 'Scan Air Quality'}
+            </button>
           </div>
 
           {/* COL 2: Pollutant Breakdown */}
