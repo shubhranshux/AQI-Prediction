@@ -118,7 +118,7 @@ export default function App(){
           <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,.45) 40%, rgba(0,0,0,.35) 70%, rgba(0,0,0,.5) 100%)',pointerEvents:'none'}}/>
 
           {/* Hero Content — Elegant & Minimal (Reference Image Style) */}
-          <div className="hero-text-block" style={{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',zIndex:10,textAlign:'center',maxWidth:640}}>
+          <div className="hero-text-block" style={{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',zIndex:10,textAlign:'center',width:'100%',maxWidth:640,padding:'0 20px'}}>
             <div style={{animation:'fade-up 1s ease-out forwards'}}>
               <h1 className="hero-title" style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:56,fontWeight:500,color:'#ffffff',lineHeight:1.1,marginBottom:16,textShadow:'0 2px 24px rgba(0,0,0,.5), 0 1px 3px rgba(0,0,0,.4)'}}>
                 <span className="hero-word" style={{display:'block'}}>Air Quality,</span>
@@ -146,7 +146,7 @@ export default function App(){
               <span style={{fontSize:15,fontWeight:800,color:'#fff',textShadow:'0 2px 8px rgba(0,0,0,.4)'}}>EnviroPredict</span>
             </div>
             <div style={{display:'flex',alignItems:'center',gap:14}}>
-              <ClockDisplay />
+              <span className="clock-wrapper"><ClockDisplay /></span>
               <button onClick={()=>setDark(!D)} style={{display:'flex',alignItems:'center',gap:6,padding:'7px 14px',borderRadius:99,border:'1px solid rgba(255,255,255,.25)',background:'rgba(255,255,255,.12)',backdropFilter:'blur(10px)',cursor:'pointer',boxShadow:'0 4px 16px rgba(0,0,0,.25)',transition:'all .3s ease'}}>
                 {D ? <Sun size={14} color="#fbbf24"/> : <Moon size={14} color="#e2e8f0"/>}
                 <span style={{fontSize:11,fontWeight:700,color:'#fff',letterSpacing:'.03em'}}>{D?'Light':'Dark'}</span>

@@ -81,6 +81,12 @@ html { scrollbar-width:thin; scrollbar-color:rgba(120,120,120,.25) transparent; 
   .stats-bar > div:nth-child(2) > div:last-child {
     display: none; /* Hide second divider on mobile so it wraps nicely */
   }
+  .clock-wrapper {
+    display: none !important;
+  }
+  .hero-text-block {
+    top: 55% !important; /* Move down slightly to avoid nav overlap */
+  }
 }
 
 /* ── DESKTOP DEFAULT GRID ── */
