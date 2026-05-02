@@ -18,7 +18,74 @@ html { scrollbar-width:thin; scrollbar-color:rgba(120,120,120,.25) transparent; 
 
 /* Redesigned Dropdown Lag-Free Hover */
 .search-select-option:hover {
-  background-color: var(--hover-bg, rgba(0,0,0,0.05));
+  background-size: cover;
+}
+
+/* ── RESPONSIVE DESIGN (Tablets & Mobile) ── */
+@media (max-width: 1280px) {
+  .dashboard-grid {
+    grid-template-columns: 280px 1fr !important; /* Stack the gauge under the pollutant breakdown */
+  }
+  .dashboard-grid > div:nth-child(3) {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 968px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .dashboard-grid > div:nth-child(3) {
+    grid-column: span 1;
+  }
+  .hero-title {
+    font-size: 44px !important;
+  }
+  .scan-section {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  .stats-bar {
+    width: 90% !important;
+    padding: 10px 16px !important;
+  }
+  .stats-bar > div {
+    padding: 0 12px !important;
+  }
+  .pollutant-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-title {
+    font-size: 34px !important;
+  }
+  .hero-sub p {
+    font-size: 13px !important;
+  }
+  .hero-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  .hero-buttons button {
+    width: 100%;
+    justify-content: center;
+  }
+  .stats-bar {
+    flex-wrap: wrap;
+    justify-content: center;
+    border-radius: 12px !important;
+    margin-top: -40px !important;
+  }
+  .stats-bar > div:nth-child(2) > div:last-child {
+    display: none; /* Hide second divider on mobile so it wraps nicely */
+  }
+}
+
+/* ── DESKTOP DEFAULT GRID ── */
+.dashboard-grid {
+  grid-template-columns: 300px 1fr 320px;
 }
 
 /* Animations */

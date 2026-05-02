@@ -181,7 +181,7 @@ export default function App(){
       <div id="scan-section" className="scan-section" style={{padding:'60px 32px 0',maxWidth:'100%'}}>
 
         {/* ── 3-COLUMN LAYOUT: Scan | Pollutants | Gauge ── */}
-        <div className="dashboard-grid" style={{display:'grid',gridTemplateColumns:'300px 1fr 320px',gap:16,marginBottom:20,position:'relative',zIndex:50,animation:'fade-up 1s ease-out 0.4s both'}}>
+        <div className="dashboard-grid" style={{display:'grid',gap:16,marginBottom:20,position:'relative',zIndex:50,animation:'fade-up 1s ease-out 0.4s both'}}>
 
           {/* COL 1: Scan Controls */}
           <div className="hover-lift" style={{...CS,padding:22,position:'relative',zIndex:20}}>
@@ -208,7 +208,7 @@ export default function App(){
               {p&&<span style={{fontSize:10,fontWeight:700,color:'#22c55e',background:'rgba(34,197,94,.08)',padding:'3px 10px',borderRadius:99}}>● LIVE</span>}
             </div>
             {p?(
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+              <div className="pollutant-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
                 {[
                   {k:'PM2.5',v:p.pm25,u:'µg/m³',m:250,c:'#22c55e'},
                   {k:'PM10',v:p.pm10,u:'µg/m³',m:430,c:'#3b82f6'},
