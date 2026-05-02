@@ -61,6 +61,20 @@ function Gauge({aqi,color,dark}){
   );
 }
 
+// Isolated Clock to prevent full-app re-renders every second
+function ClockDisplay() {
+  const [time, setTime] = useState(new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+  return (
+    <span style={{fontSize:12,color:'rgba(255,255,255,.9)',display:'flex',alignItems:'center',gap:4,textShadow:'0 2px 8px rgba(0,0,0,.4)',fontWeight:600}}>
+      <Clock size={12}/>{time.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+    </span>
+  );
+}
+
 export default function App(){
   const time=useMemo(getTimeInfo,[]);const TI=TIME[time.greeting];
   const[dark,setDark]=useState(false);const D=dark;
@@ -75,13 +89,6 @@ export default function App(){
   const [mode,setMode]=useState('auto'); // auto|manual
   const [manual,setManual]=useState({pm25:'',pm10:'',no2:'',so2:'',co:'',o3:'',temp:'',humidity:''});
   const [bars,setBars]=useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  // Auto-updating clock
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(()=>{if(district&&locMap[district])setLocation(locMap[district][0])},[district]);
   useEffect(()=>{setResult(null);setBars(false)},[district,location]);
@@ -156,7 +163,7 @@ export default function App(){
               <span style={{fontSize:15,fontWeight:800,color:'#fff',textShadow:'0 2px 8px rgba(0,0,0,.4)'}}>EnviroPredict</span>
             </div>
             <div style={{display:'flex',alignItems:'center',gap:12}}>
-              <span style={{fontSize:12,color:'rgba(255,255,255,.9)',display:'flex',alignItems:'center',gap:4,textShadow:'0 2px 8px rgba(0,0,0,.4)',fontWeight:600}}><Clock size={12}/>{currentTime.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
+              <ClockDisplay />
               <button onClick={()=>setDark(!D)} style={{width:34,height:20,borderRadius:10,border:'1px solid rgba(255,255,255,.2)',background:'rgba(255,255,255,.1)',cursor:'pointer',position:'relative',padding:0,backdropFilter:'blur(4px)',boxShadow:'0 2px 8px rgba(0,0,0,.3)'}}>
                 <div style={{width:14,height:14,borderRadius:7,background:D?'#fbbf24':'#fff',position:'absolute',top:2,left:D?17:2,transition:'all .3s',boxShadow:'0 1px 2px rgba(0,0,0,.2)'}}/>
               </button>
