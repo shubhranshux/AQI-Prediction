@@ -13,7 +13,10 @@ html { scrollbar-width:none; }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(180, 180, 180, 0.7); }
 .custom-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(180, 180, 180, 0.4) transparent; }
 
-/* Removed global * transition to fix dark mode lag */
+/* Redesigned Dropdown Lag-Free Hover */
+.search-select-option:hover {
+  background-color: var(--hover-bg, rgba(0,0,0,0.05));
+}
 
 /* Animations */
 @keyframes cloud-drift { 0% { transform: translateX(-160px); } 100% { transform: translateX(calc(100vw + 160px)); } }

@@ -7,6 +7,7 @@ import HeroBackground from "./WindmillScene";
 import { getAqiTheme, getTimeInfo } from "./themes";
 import SearchSelect from "./SearchSelect";
 import { Wind,Droplets,MapPin,Search,Leaf,Sun,Cloud,CloudRain,Skull,AlertCircle,TrendingUp,Zap,Sunset,Moon,Activity,Shield,Clock,Pencil,Radio,Sunrise,CloudSun,ExternalLink,Database,Cpu,BarChart3,Users,Heart,Eye,Sparkles } from "lucide-react";
+import { districts as staticDistricts, locMap as staticLocMap } from "./locations";
 
 const LEVELS=[{max:50,label:"Good",color:"#22c55e",I:Leaf},{max:100,label:"Satisfactory",color:"#eab308",I:Sun},{max:200,label:"Moderate",color:"#f97316",I:Cloud},{max:300,label:"Poor",color:"#ef4444",I:CloudRain},{max:400,label:"Very Poor",color:"#a855f7",I:Skull},{max:500,label:"Severe",color:"#dc2626",I:AlertCircle}];
 const getLevel=a=>LEVELS.find(l=>a<=l.max)||LEVELS[5];
@@ -63,19 +64,18 @@ function Gauge({aqi,color,dark}){
 export default function App(){
   const time=useMemo(getTimeInfo,[]);const TI=TIME[time.greeting];
   const[dark,setDark]=useState(false);const D=dark;
-  const [districts,setDistricts]=useState([]);
-  const [locMap,setLocMap]=useState({});
-  const [district,setDistrict]=useState('');
-  const [location,setLocation]=useState('');
+
+  const [districts,setDistricts]=useState(staticDistricts);
+  const [locMap,setLocMap]=useState(staticLocMap);
+  const [district,setDistrict]=useState(staticDistricts[0]||'');
+  const [location,setLocation]=useState(staticLocMap[staticDistricts[0]]?.[0]||'');
   const [result,setResult]=useState(null);
   const [loading,setLoading]=useState(false);
-  const [fetchingLocs,setFetchingLocs]=useState(true);
   const [error,setError]=useState(null);
   const [mode,setMode]=useState('auto'); // auto|manual
   const [manual,setManual]=useState({pm25:'',pm10:'',no2:'',so2:'',co:'',o3:'',temp:'',humidity:''});
   const [bars,setBars]=useState(false);
 
-  useEffect(()=>{getLocations().then(d=>{setDistricts(d.districts);setLocMap(d.locations);if(d.districts.length){setDistrict(d.districts[0]);setLocation(d.locations[d.districts[0]]?.[0]||'')}setFetchingLocs(false)}).catch(()=>{setError('Backend offline');setFetchingLocs(false)})},[]);
   useEffect(()=>{if(district&&locMap[district])setLocation(locMap[district][0])},[district]);
   useEffect(()=>{setResult(null);setBars(false)},[district,location]);
   const scan=async()=>{setLoading(true);setError(null);setBars(false);try{let r;if(mode==='auto')r=await predictAuto(district,location);else{const n={};for(const k in manual)n[k]=parseFloat(manual[k])||0;r=await predictManual({...n,district,location})}setResult(r);setTimeout(()=>setBars(true),400)}catch{setError('Prediction failed')}setLoading(false)};
@@ -164,11 +164,11 @@ export default function App(){
               <button onClick={()=>setMode('auto')} style={{flex:1,padding:'8px 0',borderRadius:8,border:'none',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:"'Inter'",display:'flex',alignItems:'center',justifyContent:'center',gap:4,background:mode==='auto'?T.card:'transparent',color:mode==='auto'?T.text:T.sub,boxShadow:mode==='auto'&&!D?'0 1px 3px rgba(0,0,0,.05)':'none'}}><Radio size={11}/>Auto</button>
               <button onClick={()=>setMode('manual')} style={{flex:1,padding:'8px 0',borderRadius:8,border:'none',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:"'Inter'",display:'flex',alignItems:'center',justifyContent:'center',gap:4,background:mode==='manual'?T.card:'transparent',color:mode==='manual'?T.text:T.sub,boxShadow:mode==='manual'&&!D?'0 1px 3px rgba(0,0,0,.05)':'none'}}><Pencil size={11}/>Manual</button>
             </div>
-            <SearchSelect label="District" value={district} options={districts} onChange={setDistrict} placeholder="Search..." dark={D} loading={fetchingLocs}/>
-            <SearchSelect label="Location" value={location} options={locMap[district]||[]} onChange={setLocation} placeholder="Search..." dark={D} loading={fetchingLocs}/>
+            <SearchSelect label="District" value={district} options={districts} onChange={setDistrict} placeholder="Search..." dark={D} />
+            <SearchSelect label="Location" value={location} options={locMap[district]||[]} onChange={setLocation} placeholder="Search..." dark={D} />
             {mode==='manual'&&<div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:5,marginBottom:10}}>{FIELDS.map(f=><div key={f.k}><div style={{fontSize:8,color:T.sub,letterSpacing:'.06em',textTransform:'uppercase',fontWeight:700,marginBottom:2}}>{f.l}</div><input type="number" step="any" placeholder="0" value={manual[f.k]} onChange={e=>setManual(p=>({...p,[f.k]:e.target.value}))} style={{width:'100%',background:T.inp,border:`1.5px solid ${T.inpB}`,borderRadius:8,padding:'6px 8px',fontSize:11,fontFamily:"'Inter'",color:T.text,outline:'none'}}/></div>)}</div>}
             {error&&<div style={{background:'rgba(239,68,68,.06)',borderRadius:8,padding:'6px 8px',marginBottom:8,fontSize:10,color:'#ef4444',display:'flex',alignItems:'center',gap:4}}><AlertCircle size={11}/>{error}</div>}
-            <button onClick={scan} disabled={loading||(!districts.length && !fetchingLocs)} style={{width:'100%',padding:14,borderRadius:14,border:'none',background:T.acc,color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:"'Inter'",opacity:(loading||fetchingLocs)?0.6:1,transition:'all .2s',boxShadow:'0 4px 12px rgba(15,23,42,.15)',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
+            <button onClick={scan} disabled={loading||(!districts.length)} style={{width:'100%',padding:14,borderRadius:14,border:'none',background:T.acc,color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:"'Inter'",opacity:(loading)?0.6:1,transition:'all .2s',boxShadow:'0 4px 12px rgba(15,23,42,.15)',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
               {loading ? (
                 <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{animation:'spin-anim 1s linear infinite'}}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Scanning...</>
               ) : 'Scan Air Quality'}
