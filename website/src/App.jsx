@@ -158,7 +158,7 @@ export default function App(){
         <div className="gsap-fade dashboard-grid" style={{display:'grid',gridTemplateColumns:'300px 1fr 320px',gap:16,marginBottom:20}}>
 
           {/* COL 1: Scan Controls */}
-          <div style={{...CS,padding:22,position:'relative',zIndex:20}}>
+          <div className="hover-lift" style={{...CS,padding:22,position:'relative',zIndex:20}}>
             <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}><Search size={15} color={T.acc}/><span style={{fontSize:15,fontWeight:800}}>Scan</span></div>
             <div style={{display:'flex',background:D?'#252523':'#f0ebe4',borderRadius:10,padding:3,gap:2,marginBottom:12}}>
               <button onClick={()=>setMode('auto')} style={{flex:1,padding:'8px 0',borderRadius:8,border:'none',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:"'Inter'",display:'flex',alignItems:'center',justifyContent:'center',gap:4,background:mode==='auto'?T.card:'transparent',color:mode==='auto'?T.text:T.sub,boxShadow:mode==='auto'&&!D?'0 1px 3px rgba(0,0,0,.05)':'none'}}><Radio size={11}/>Auto</button>
@@ -168,7 +168,7 @@ export default function App(){
             <SearchSelect label="Location" value={location} options={locMap[district]||[]} onChange={setLocation} placeholder="Search..." dark={D} />
             {mode==='manual'&&<div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:5,marginBottom:10}}>{FIELDS.map(f=><div key={f.k}><div style={{fontSize:8,color:T.sub,letterSpacing:'.06em',textTransform:'uppercase',fontWeight:700,marginBottom:2}}>{f.l}</div><input type="number" step="any" placeholder="0" value={manual[f.k]} onChange={e=>setManual(p=>({...p,[f.k]:e.target.value}))} style={{width:'100%',background:T.inp,border:`1.5px solid ${T.inpB}`,borderRadius:8,padding:'6px 8px',fontSize:11,fontFamily:"'Inter'",color:T.text,outline:'none'}}/></div>)}</div>}
             {error&&<div style={{background:'rgba(239,68,68,.06)',borderRadius:8,padding:'6px 8px',marginBottom:8,fontSize:10,color:'#ef4444',display:'flex',alignItems:'center',gap:4}}><AlertCircle size={11}/>{error}</div>}
-            <button onClick={scan} disabled={loading||(!districts.length)} style={{width:'100%',padding:14,borderRadius:14,border:'none',background:T.acc,color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:"'Inter'",opacity:(loading)?0.6:1,transition:'all .2s',boxShadow:'0 4px 12px rgba(15,23,42,.15)',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
+            <button onClick={scan} disabled={loading||(!districts.length)} className="hover-scale" style={{width:'100%',padding:14,borderRadius:14,border:'none',background:T.acc,color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:"'Inter'",opacity:(loading)?0.6:1,boxShadow:'0 4px 12px rgba(15,23,42,.15)',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
               {loading ? (
                 <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{animation:'spin-anim 1s linear infinite'}}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Scanning...</>
               ) : 'Scan Air Quality'}
@@ -176,7 +176,7 @@ export default function App(){
           </div>
 
           {/* COL 2: Pollutant Breakdown */}
-          <div style={{...CS,padding:24}}>
+          <div className="hover-lift" style={{...CS,padding:24}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
               <div style={{...LB,fontSize:12}}>Pollutant Breakdown</div>
               {p&&<span style={{fontSize:10,fontWeight:700,color:'#22c55e',background:'rgba(34,197,94,.08)',padding:'3px 10px',borderRadius:99}}>● LIVE</span>}
@@ -191,7 +191,7 @@ export default function App(){
                   {k:'CO',v:p.co,u:'mg/m³',m:10,c:'#a78bfa'},
                   {k:'SO₂',v:p.so2,u:'µg/m³',m:350,c:'#f97316'},
                 ].map(pl=>(
-                  <div key={pl.k} className="theme-animate" style={{background:D?'#1a1a18':'#f8fafc',border:`1px solid ${D?'rgba(255,255,255,.05)':'rgba(0,0,0,.04)'}`,borderRadius:16,padding:'16px 18px',display:'flex',flexDirection:'column'}}>
+                  <div key={pl.k} className="theme-animate hover-scale" style={{background:D?'#1a1a18':'#f8fafc',border:`1px solid ${D?'rgba(255,255,255,.05)':'rgba(0,0,0,.04)'}`,borderRadius:16,padding:'16px 18px',display:'flex',flexDirection:'column'}}>
                     <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:8}}>
                       <div style={{width:8,height:8,borderRadius:'50%',background:pl.c,boxShadow:`0 0 8px ${pl.c}88`}}/>
                       <span style={{fontSize:13,fontWeight:700,color:T.sub}}>{pl.k}</span>
@@ -214,7 +214,7 @@ export default function App(){
           </div>
 
           {/* COL 3: AQI Gauge Meter */}
-          <div style={{...CS,padding:24,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
+          <div className="hover-lift" style={{...CS,padding:24,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
             <Gauge aqi={aqi??0} color={lv?.color||T.mut} dark={D}/>
             <div style={{fontSize:56,fontWeight:900,color:lv?.color||T.mut,lineHeight:1,marginTop:4}}>{aqi??'--'}</div>
             <div style={{fontSize:11,letterSpacing:'.12em',textTransform:'uppercase',color:T.sub,fontWeight:700,marginTop:8}}>Air Quality Index</div>
@@ -236,7 +236,7 @@ export default function App(){
         {/* Health Tips */}
         {aqi!==null&&<div className="health-grid" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:14,marginBottom:20}}>
           {[{I:Activity,t:'Outdoor Activity',tip:aqi<100?'Great for sports & jogging.':'Limit prolonged outdoor exertion.',c:'#22c55e'},{I:Shield,t:'Protection',tip:aqi<100?'No mask needed today.':'N95 mask recommended outdoors.',c:'#3b82f6'},{I:Wind,t:'Ventilation',tip:aqi<100?'Open windows for fresh air.':'Keep windows closed. Use purifiers.',c:'#eab308'}].map(h=>(
-            <div key={h.t} style={{...CS,padding:20,display:'flex',alignItems:'center',gap:14}}>
+            <div key={h.t} className="hover-lift" style={{...CS,padding:20,display:'flex',alignItems:'center',gap:14}}>
               <div style={{width:40,height:40,borderRadius:12,background:`${h.c}0A`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><h.I size={18} color={h.c}/></div>
               <div><div style={{fontSize:14,fontWeight:800}}>{h.t}</div><div style={{fontSize:13,color:T.sub,lineHeight:1.5}}>{h.tip}</div></div>
             </div>
@@ -248,7 +248,7 @@ export default function App(){
           <div style={{textAlign:'center',marginBottom:24}}><div style={LB}>Why EnviroPredict</div><h2 style={{fontSize:30,fontWeight:900,margin:'4px 0'}}>Built for Precision</h2></div>
           <div className="features-grid" style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:14}}>
             {[{I:Cpu,t:'ML Powered',d:'XGBoost with 98.83% accuracy.',c:'#d4a574'},{I:Database,t:'Live Data',d:'Real-time from Open-Meteo API.',c:'#3b82f6'},{I:BarChart3,t:'6 Pollutants',d:'Complete pollutant analysis.',c:'#22c55e'},{I:Sparkles,t:'Smart UI',d:'Landscape reacts to AQI.',c:'#a855f7'}].map(f=>(
-              <div key={f.t} style={{...CS,padding:22,textAlign:'center'}}>
+              <div key={f.t} className="hover-lift" style={{...CS,padding:22,textAlign:'center'}}>
                 <div style={{width:44,height:44,borderRadius:12,background:`${f.c}12`,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 12px'}}><f.I size={20} color={f.c}/></div>
                 <div style={{fontSize:15,fontWeight:800,marginBottom:4}}>{f.t}</div><div style={{fontSize:13,color:T.sub,lineHeight:1.5}}>{f.d}</div>
               </div>
@@ -258,8 +258,8 @@ export default function App(){
 
         {/* Tech + Team */}
         <div className="gsap-fade tech-team-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:20}}>
-          <div style={{...CS,padding:24}}><div style={LB}>Tech Stack</div><div style={{display:'flex',flexWrap:'wrap',gap:8}}>{['XGBoost','FastAPI','React','Vite','Tailwind','scikit-learn','Open-Meteo','Lucide'].map(t=><span key={t} style={{background:D?'#252523':T.inp,border:`1px solid ${T.cb}`,borderRadius:99,padding:'6px 14px',fontSize:12,fontWeight:600,color:T.sub}}>{t}</span>)}</div></div>
-          <div style={{...CS,padding:24}}><div style={LB}>Team</div><div style={{display:'flex',gap:10,flexWrap:'wrap'}}>{[{n:'Shubhranshu Behera',r:'ML & Backend'},{n:'Rupak Ranjan Parida',r:'Data Analysis'},{n:'Ranjan Kumar Nayak',r:'Research'},{n:'Pramod Kumar Mohananta',r:'Frontend'}].map(m=><div key={m.n} style={{flex:'1 1 120px',background:D?'#1a1a18':T.inp,borderRadius:16,padding:'16px 10px',textAlign:'center'}}><div style={{width:40,height:40,borderRadius:'50%',background:T.acc,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 12px',boxShadow:'0 4px 12px rgba(0,0,0,.1)'}}><Users size={16} color="#fff"/></div><div style={{fontSize:13,fontWeight:700,color:T.text}}>{m.n}</div><div style={{fontSize:11,color:T.sub,marginTop:4,fontWeight:500}}>{m.r}</div></div>)}</div></div>
+          <div className="hover-lift" style={{...CS,padding:24}}><div style={LB}>Tech Stack</div><div style={{display:'flex',flexWrap:'wrap',gap:8}}>{['XGBoost','FastAPI','React','Vite','Tailwind','scikit-learn','Open-Meteo','Lucide'].map(t=><span key={t} className="hover-scale" style={{background:D?'#252523':T.inp,border:`1px solid ${T.cb}`,borderRadius:99,padding:'6px 14px',fontSize:12,fontWeight:600,color:T.sub,cursor:'default',display:'inline-block'}}>{t}</span>)}</div></div>
+          <div className="hover-lift" style={{...CS,padding:24}}><div style={LB}>Team</div><div style={{display:'flex',gap:10,flexWrap:'wrap'}}>{[{n:'Shubhranshu Behera',r:'ML & Backend'},{n:'Rupak Ranjan Parida',r:'Data Analysis'},{n:'Ranjan Kumar Nayak',r:'Research'},{n:'Pramod Kumar Mohananta',r:'Frontend'}].map(m=><div key={m.n} className="hover-scale" style={{flex:'1 1 120px',background:D?'#1a1a18':T.inp,borderRadius:16,padding:'16px 10px',textAlign:'center'}}><div style={{width:40,height:40,borderRadius:'50%',background:T.acc,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 12px',boxShadow:'0 4px 12px rgba(0,0,0,.1)'}}><Users size={16} color="#fff"/></div><div style={{fontSize:13,fontWeight:700,color:T.text}}>{m.n}</div><div style={{fontSize:11,color:T.sub,marginTop:4,fontWeight:500}}>{m.r}</div></div>)}</div></div>
         </div>
 
         <footer className="site-footer" style={{borderTop:`1px solid ${T.div}`,padding:'18px 0 22px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
