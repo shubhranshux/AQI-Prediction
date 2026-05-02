@@ -3,11 +3,22 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 import { getLocations, predictAuto, predictManual } from "./api";
-import HeroBackground from "./WindmillScene";
 import { getAqiTheme, getTimeInfo } from "./themes";
 import SearchSelect from "./SearchSelect";
-import { Wind,Droplets,MapPin,Search,Leaf,Sun,Cloud,CloudRain,Skull,AlertCircle,TrendingUp,Zap,Sunset,Moon,Activity,Shield,Clock,Pencil,Radio,Sunrise,CloudSun,ExternalLink,Database,Cpu,BarChart3,Users,Heart,Eye,Sparkles } from "lucide-react";
+import { Shield, Wind, CloudRain, Thermometer, Droplets, ArrowRight, Sun, Moon, MapPin, Search, Activity, Leaf, Clock, Sparkles, Skull, AlertCircle, Pencil, Radio, Users, Heart, Eye, Cloud, CloudSun, Sunset, Sunrise } from 'lucide-react';
+import WindmillScene from './WindmillScene';
+import Lanyard from './Lanyard';
 import { districts as staticDistricts, locMap as staticLocMap } from "./locations";
+import React from 'react';
+
+class ErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false, error: null }; }
+  static getDerivedStateFromError(error) { return { hasError: true, error }; }
+  render() { if (this.state.hasError) return <div style={{position:'absolute',top:200,left:'50%',transform:'translateX(-50%)',zIndex:999,background:'red',color:'white',padding:20}}>Error: {this.state.error?.message}</div>; return this.props.children; }
+}
+
+
+const T_DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
 const LEVELS=[{max:50,label:"Good",color:"#22c55e",I:Leaf},{max:100,label:"Satisfactory",color:"#eab308",I:Sun},{max:200,label:"Moderate",color:"#f97316",I:Cloud},{max:300,label:"Poor",color:"#ef4444",I:CloudRain},{max:400,label:"Very Poor",color:"#a855f7",I:Skull},{max:500,label:"Severe",color:"#dc2626",I:AlertCircle}];
 const getLevel=a=>LEVELS.find(l=>a<=l.max)||LEVELS[5];
@@ -108,7 +119,6 @@ export default function App(){
       // 1. Hero Text & Stats
       gsap.from('.hero-word', { y: 80, opacity: 0, duration: 1, stagger: 0.15, ease: 'power4.out', delay: 0.1 });
       gsap.from('.hero-sub', { y: 20, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.6 });
-      gsap.from('.stats-bar', { y: 40, opacity: 0, duration: 1.2, ease: 'elastic.out(1, 0.7)', delay: 0.8 });
 
       // 2. Dashboard Sections Stagger
       gsap.utils.toArray('.gsap-stagger-section').forEach(section => {
@@ -131,30 +141,33 @@ export default function App(){
       {/* ═══ HERO — Xurya style ═══ */}
       <div style={{padding:16,position:'relative',marginBottom:48}}>
         {/* Landscape container — full width, rounded */}
-        <div className="hero-landscape" style={{position:'relative',height:'80vh',minHeight:520,borderRadius:24,overflow:'hidden',transform:'translateZ(0)',isolation:'isolate',WebkitMaskImage:'-webkit-radial-gradient(white, black)'}}>
-          <HeroBackground isNight={time.isNight}/>
+        <div className="hero-landscape" style={{position:'relative',height:'90vh',minHeight:600,borderRadius:24,overflow:'hidden',transform:'translateZ(0)',isolation:'isolate',WebkitMaskImage:'-webkit-radial-gradient(white, black)'}}>
+          <WindmillScene isNight={D}/>
           {/* Dark overlay for text readability */}
-          <div style={{position:'absolute',inset:0,background:'linear-gradient(to right, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 50%, transparent 100%)',pointerEvents:'none'}}/>
+          <div style={{position:'absolute',inset:0,background:'radial-gradient(ellipse 80% 70% at 50% 45%, rgba(0,0,0,.55) 0%, rgba(0,0,0,.15) 60%, transparent 100%)',pointerEvents:'none'}}/>
 
-          {/* Hero Content Overlay (Premium Styling) */}
-          <div className="hero-text-block" style={{position:'absolute',bottom:80,left:60,zIndex:10,maxWidth:540}}>
-            <div className="hero-sub" style={{display:'inline-flex',alignItems:'center',gap:8,background:'rgba(255,255,255,.1)',backdropFilter:'blur(12px)',padding:'6px 16px',borderRadius:99,color:'#fff',fontSize:12,fontWeight:700,letterSpacing:'.08em',marginBottom:24,border:'1px solid rgba(255,255,255,.15)',boxShadow:'0 4px 12px rgba(0,0,0,.1)'}}>
-              <Sparkles size={14} color="#fbbf24"/> LIVE ML PREDICTION
-            </div>
-            <h1 className="hero-title" style={{fontSize:62,fontWeight:900,color:'#fff',lineHeight:1.05,letterSpacing:'-0.03em',marginBottom:18,textShadow:'0 4px 24px rgba(0,0,0,.4)'}}>
-              <div style={{overflow:'hidden',paddingBottom:4}}><span className="hero-word" style={{display:'block'}}>Air Quality.</span></div>
-              <div style={{overflow:'hidden',paddingBottom:4}}><span className="hero-word" style={{display:'block',color:'#d4a574'}}>Redefined.</span></div>
+          {/* Hero Content — Elegant & Minimal (Reference Image Style) */}
+          <div className="hero-text-block" style={{position:'absolute',top:'40%',left:'50%',transform:'translate(-50%,-50%)',zIndex:10,textAlign:'center',maxWidth:640}}>
+            <h1 className="hero-title" style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:56,fontWeight:500,color:'#111827',lineHeight:1.1,marginBottom:16,textShadow:'0 2px 16px rgba(255,255,255,.6)'}}>
+              <span className="hero-word" style={{display:'block'}}>Air Quality,</span>
+              <span className="hero-word" style={{display:'block'}}>One Step at a Time</span>
             </h1>
-            <p className="hero-sub" style={{fontSize:16,color:'rgba(255,255,255,.9)',lineHeight:1.6,fontWeight:500,marginBottom:36,textShadow:'0 2px 10px rgba(0,0,0,.2)'}}>Hyper-local predictions powered by XGBoost. Stay ahead of pollution with our AI-driven insights across Odisha.</p>
-            <div className="hero-sub hero-buttons" style={{display:'flex',gap:12,flexWrap:'wrap'}}>
-              <button className="hover-scale" onClick={()=>document.getElementById('scan-section').scrollIntoView({behavior:'smooth'})} style={{padding:'12px 24px',borderRadius:99,border:'none',background:'#fff',color:'#1a1510',fontSize:13,fontWeight:800,cursor:'pointer',display:'flex',alignItems:'center',gap:6,fontFamily:"'Inter'",boxShadow:'0 8px 24px rgba(255,255,255,.2)'}}>
-                <Search size={14}/>Scan Now
+            <p className="hero-sub" style={{fontFamily:"'Inter', sans-serif",fontSize:15,fontWeight:500,color:'#374151',marginBottom:32,lineHeight:1.5,textShadow:'0 1px 12px rgba(255,255,255,.5)'}}>
+              Hyper-local ML predictions designed to ensure<br/>a healthier environment and inner peace.
+            </p>
+
+            <div className="hero-sub hero-buttons" style={{display:'flex',gap:16,flexWrap:'wrap',justifyContent:'center'}}>
+              <button className="hover-scale" onClick={()=>document.getElementById('scan-section').scrollIntoView({behavior:'smooth'})} style={{padding:'12px 28px',borderRadius:8,border:'none',background:'#3b82f6',color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',display:'flex',alignItems:'center',gap:8,fontFamily:"'Inter'",boxShadow:'0 4px 12px rgba(59,130,246,.3)'}}>
+                <Sparkles size={16}/> Start now
               </button>
-              <button className="hover-lift" onClick={()=>document.getElementById('features').scrollIntoView({behavior:'smooth'})} style={{padding:'12px 24px',borderRadius:99,border:'1px solid rgba(255,255,255,.4)',background:'rgba(255,255,255,.1)',color:'#fff',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:"'Inter'",backdropFilter:'blur(8px)',boxShadow:'0 4px 16px rgba(0,0,0,.1)'}}>
+              <button className="hover-lift" onClick={()=>document.getElementById('features').scrollIntoView({behavior:'smooth'})} style={{padding:'12px 28px',borderRadius:8,border:'none',background:'rgba(255,255,255,.9)',backdropFilter:'blur(4px)',color:'#111827',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:"'Inter'",boxShadow:'0 4px 12px rgba(0,0,0,.05)'}}>
                 Our Features
               </button>
             </div>
           </div>
+          
+          {/* Interactive 3D Lanyard Stats */}
+          <ErrorBoundary><Lanyard /></ErrorBoundary>
           
           {/* Nav on top of landscape */}
           <div className="hero-nav" style={{position:'absolute',top:0,left:0,right:0,zIndex:15,padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
@@ -170,17 +183,6 @@ export default function App(){
               </button>
             </div>
           </div>
-
-        </div>
-
-        {/* Stats bar — bottom right, overlapping */}
-        <div className="stats-bar" style={{position:'absolute',bottom:-28,right:32,zIndex:20,...CS,padding:'22px 36px',display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:28,minWidth:480}}>
-          {[{v:'98.83%',l:'Model Accuracy',c:T.acc},{v:'400+',l:'Locations Covered',c:'#3b82f6'},{v:'9',l:'Districts in Odisha',c:'#22c55e'}].map(s=>(
-            <div key={s.l} style={{textAlign:'center'}}>
-              <div style={{fontSize:28,fontWeight:900,color:s.c}}>{s.v}</div>
-              <div style={{fontSize:11,color:T.sub,marginTop:2}}>{s.l}</div>
-            </div>
-          ))}
         </div>
       </div>
 

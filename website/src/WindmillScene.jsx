@@ -1,401 +1,372 @@
 import { useMemo } from 'react';
 
 /*
-  Zen Mountain Hero — Realistic landscape
-  - Layered realistic mountain silhouettes
-  - Drifting clouds (varied sizes/speeds)
-  - V-shaped bird flocks
-  - Small house on the hillside
-  - Flowing river with shimmer animation
-  - Windmill on the ridge
-  - Mist + floating particles
-  - Day/Night modes
+  CINEMATIC GOLDEN HOUR HERO
+  Dramatic warm sky, bold mountains, visible sun rays,
+  large puffy clouds, prominent house, wide river
 */
 export default function HeroBackground({ isNight = false }) {
   const N = isNight;
 
-  const clouds = useMemo(() =>
-    Array.from({ length: 7 }, (_, i) => ({
-      id: i,
-      top: 6 + Math.random() * 30,
-      size: 100 + Math.random() * 140,
-      opacity: N ? (0.08 + Math.random() * 0.12) : (0.35 + Math.random() * 0.45),
-      duration: 50 + Math.random() * 50,
-      delay: -(Math.random() * 70),
-    })), [N]);
+  const clouds = useMemo(() => [
+    { id:0, top:8, w:220, op:N?.1:.7, dur:70, del:-10 },
+    { id:1, top:18, w:180, op:N?.08:.55, dur:85, del:-40 },
+    { id:2, top:12, w:260, op:N?.12:.65, dur:60, del:-65 },
+    { id:3, top:25, w:140, op:N?.07:.5, dur:90, del:-25 },
+    { id:4, top:6, w:200, op:N?.09:.6, dur:75, del:-55 },
+  ], [N]);
 
-  const birds = useMemo(() =>
-    Array.from({ length: 5 }, (_, i) => ({
-      id: i,
-      top: 10 + Math.random() * 22,
-      size: 16 + Math.random() * 16,
-      duration: 16 + Math.random() * 18,
-      delay: -(Math.random() * 35),
-    })), []);
+  const birds = useMemo(() => [
+    { id:0, top:14, s:22, dur:22, del:-5 },
+    { id:1, top:20, s:18, dur:28, del:-15 },
+    { id:2, top:10, s:26, dur:20, del:-25 },
+    { id:3, top:24, s:16, dur:32, del:-8 },
+  ], []);
 
   const particles = useMemo(() =>
-    Array.from({ length: 25 }, (_, i) => ({
-      x: Math.random() * 100,
-      size: 1.5 + Math.random() * 3,
-      opacity: 0.06 + Math.random() * 0.18,
-      delay: Math.random() * 12,
-      drift: -20 + Math.random() * 40,
-      dur: 16 + Math.random() * 10,
-    })), []);
+    Array.from({ length: 30 }, () => ({
+      x: Math.random()*100, s: N?(2+Math.random()*2.5):(1+Math.random()*2),
+      op: N?(.2+Math.random()*.4):(.05+Math.random()*.12),
+      dur: 12+Math.random()*10, del: Math.random()*14,
+      dr: -25+Math.random()*50,
+    })), [N]);
 
-  const C = N
-    ? { sky1:'#070b16', sky2:'#0c1525', sky3:'#111d35', sky4:'#0a1322',
-        orb:'#e8e4d0', orbG:'rgba(200,200,180,.12)', orbS:'rgba(180,180,160,.06)',
-        cloud:'rgba(80,100,140,.18)', bird:'rgba(160,180,210,.35)',
-        mt1a:'#0d1520', mt1b:'#080d18', mt2a:'#0b1219', mt2b:'#070b12',
-        mt3a:'#091012', mt3b:'#050910', mt4a:'#060a0e', mt4b:'#030608',
-        river:'rgba(60,100,160,.3)', riverShine:'rgba(120,160,220,.15)',
-        house:'#1a2030', houseRoof:'#12181f', houseWin:'#FDC500',
-        mist:'rgba(40,60,100,.08)', particle:'100,140,190',
-        snow:'rgba(200,210,230,.15)', treeLine:'#0a1018' }
-    : { sky1:'#6ab4d6', sky2:'#82c4de', sky3:'#a8d8ea', sky4:'#c8e8f4',
-        orb:'#ffd700', orbG:'rgba(255,200,0,.22)', orbS:'rgba(255,165,0,.08)',
-        cloud:'rgba(255,255,255,.8)', bird:'rgba(30,25,15,.5)',
-        mt1a:'#3a7d52', mt1b:'#2a6840', mt2a:'#2d6b42', mt2b:'#1f5832',
-        mt3a:'#245a35', mt3b:'#1a4c28', mt4a:'#1e4e2c', mt4b:'#154020',
-        river:'rgba(80,160,220,.45)', riverShine:'rgba(180,220,255,.35)',
-        house:'#6b5a48', houseRoof:'#4a3828', houseWin:'#FDC500',
-        mist:'rgba(255,255,255,.1)', particle:'70,130,80',
-        snow:'rgba(255,255,255,.6)', treeLine:'#1a4020' };
+  // DRAMATIC color palettes
+  const C = N ? {
+    sky: 'linear-gradient(180deg, #020610 0%, #0a1428 25%, #0f1e3a 50%, #081530 75%, #040a18 100%)',
+    orb: '#e8e2cc', orbGlow: 'rgba(200,190,160,.15)',
+    cloud: 'rgba(60,80,120,.12)',
+    bird: 'rgba(140,160,200,.25)',
+    // Mountain colors: dark blue-green layers
+    m1:'#101828', m1b:'#0a1018', m2:'#0c1420', m2b:'#080e16',
+    m3:'#081018', m3b:'#050a10', m4:'#040810', m4b:'#020408',
+    snow: 'rgba(160,180,210,.15)',
+    tree: '#060a10',
+    river: 'rgba(40,80,140,.3)', rivShine: 'rgba(80,130,200,.15)',
+    house: '#151e2c', roof: '#0c1420', win: '#FDC500', winGlow: 'rgba(253,197,0,.2)',
+    mist: 'rgba(20,40,80,.08)',
+    part: '150,180,255',
+  } : {
+    // GOLDEN HOUR — warm dramatic sunset palette
+    sky: 'linear-gradient(180deg, #1a5276 0%, #2e86ab 20%, #5dade2 40%, #85c1e9 55%, #aed6f1 70%, #fadbd8 85%, #f5b041 95%, #e67e22 100%)',
+    orb: '#ffd700', orbGlow: 'rgba(255,180,0,.25)',
+    cloud: 'rgba(255,255,255,.75)',
+    bird: 'rgba(20,15,5,.5)',
+    // Mountain colors: rich greens with warm tones
+    m1:'#2e7d4a', m1b:'#1d5c32', m2:'#256b3d', m2b:'#1a5530',
+    m3:'#1c5a32', m3b:'#134825', m4:'#154020', m4b:'#0e3018',
+    snow: 'rgba(255,255,255,.55)',
+    tree: '#0f3018',
+    river: 'rgba(60,140,210,.45)', rivShine: 'rgba(170,215,255,.35)',
+    house: '#6b5a48', roof: '#4a3828', win: '#FDC500', winGlow: 'rgba(253,197,0,.08)',
+    mist: 'rgba(255,240,220,.1)',
+    part: '80,130,60',
+  };
 
   return (
     <>
       <style>{`
-        .zen-bg {
-          position: absolute; inset: 0; overflow: hidden;
-          background: linear-gradient(180deg, ${C.sky1} 0%, ${C.sky2} 30%, ${C.sky3} 60%, ${C.sky4} 100%);
-        }
+        .hbg{position:absolute;inset:0;overflow:hidden;background:${C.sky}}
 
-        .zen-aurora {
-          position: absolute; inset: -40%; width: 180%; height: 180%;
-          background:
-            radial-gradient(ellipse 70% 50% at 25% 40%, rgba(100,160,220,.06) 0%, transparent 55%),
-            radial-gradient(ellipse 50% 40% at 72% 30%, rgba(80,60,140,.04) 0%, transparent 50%);
-          animation: za-drift 28s ease-in-out infinite alternate;
-          z-index: 1;
-        }
-        @keyframes za-drift {
-          0% { transform: translate(0,0); }
-          100% { transform: translate(1.5%,-0.8%); }
-        }
+        /* SUN RAYS — visible rotating beams */
+        .h-rays{position:absolute;z-index:2;pointer-events:none;
+          ${N?'display:none':''}
+          right:8%;top:2%;width:500px;height:500px;
+          background:conic-gradient(from 0deg,
+            rgba(255,200,50,.08),transparent 6%,
+            rgba(255,200,50,.06),transparent 12%,
+            rgba(255,200,50,.08),transparent 18%,
+            rgba(255,200,50,.06),transparent 24%,
+            rgba(255,200,50,.08),transparent 30%,
+            rgba(255,200,50,.06),transparent 36%,
+            rgba(255,200,50,.08),transparent 42%,
+            rgba(255,200,50,.06),transparent 48%,
+            rgba(255,200,50,.08),transparent 54%,
+            rgba(255,200,50,.06),transparent 60%,
+            rgba(255,200,50,.08),transparent 66%,
+            rgba(255,200,50,.06),transparent 72%,
+            rgba(255,200,50,.08),transparent 78%,
+            rgba(255,200,50,.06),transparent 84%,
+            rgba(255,200,50,.08),transparent 90%,
+            rgba(255,200,50,.06),transparent 96%);
+          border-radius:50%;
+          animation:ray-spin 80s linear infinite;
+          mask-image:radial-gradient(circle,black 10%,transparent 55%);
+          -webkit-mask-image:radial-gradient(circle,black 10%,transparent 55%)}
+        @keyframes ray-spin{to{transform:rotate(360deg)}}
 
-        .zen-orb {
-          position: absolute; right: 16%; top: 12%;
-          width: ${N ? 60 : 80}px; height: ${N ? 60 : 80}px;
-          border-radius: 50%;
-          background: radial-gradient(circle at 35% 35%, ${N?'#fffff4':'#fff8dc'}, ${C.orb});
-          box-shadow: 0 0 35px ${C.orbG}, 0 0 90px ${C.orbS}, 0 0 180px ${C.orbS};
-          z-index: 4;
-        }
-        .zen-orb::after {
-          content:''; position:absolute; inset:-55%; border-radius:50%;
-          background: radial-gradient(circle, ${C.orbG}, transparent 65%);
-          animation: zo-pulse 5s ease-in-out infinite alternate;
-        }
-        @keyframes zo-pulse { 0%{transform:scale(1);opacity:.45} 100%{transform:scale(1.12);opacity:.8} }
+        /* SUN/MOON ORB */
+        .h-orb{position:absolute;right:13%;top:9%;width:${N?55:80}px;height:${N?55:80}px;
+          border-radius:50%;z-index:4;
+          background:radial-gradient(circle at 35% 35%,${N?'#fffff0':'#fff8dc'},${C.orb});
+          box-shadow:0 0 30px ${C.orbGlow},0 0 80px ${C.orbGlow},0 0 150px ${C.orbGlow}${N?'':`,0 0 250px ${C.orbGlow}`}}
+        .h-orb::after{content:'';position:absolute;inset:-50%;border-radius:50%;
+          background:radial-gradient(circle,${C.orbGlow},transparent 55%);
+          animation:orb-p 5s ease-in-out infinite alternate}
+        @keyframes orb-p{0%{transform:scale(1);opacity:.4}100%{transform:scale(1.12);opacity:.8}}
 
-        /* Clouds */
-        .zen-cloud { position:absolute; z-index:6; pointer-events:none; animation: zc-drift linear infinite; }
-        @keyframes zc-drift { 0%{transform:translateX(-280px)} 100%{transform:translateX(calc(100vw + 280px))} }
+        /* CLOUDS */
+        .hcl{position:absolute;z-index:6;pointer-events:none;animation:hcl-d linear infinite}
+        @keyframes hcl-d{0%{transform:translateX(-320px)}100%{transform:translateX(calc(100vw + 320px))}}
 
-        /* Birds */
-        .zen-bird { position:absolute; z-index:7; pointer-events:none; animation: zb-fly linear infinite; }
-        @keyframes zb-fly {
-          0%{transform:translateX(-60px) translateY(0)}
-          20%{transform:translateX(20vw) translateY(-10px)}
-          40%{transform:translateX(40vw) translateY(3px)}
-          60%{transform:translateX(60vw) translateY(-7px)}
-          80%{transform:translateX(80vw) translateY(2px)}
-          100%{transform:translateX(calc(100vw + 60px)) translateY(-4px)}
-        }
+        /* BIRDS */
+        .hbd{position:absolute;z-index:7;pointer-events:none;animation:hbd-f linear infinite}
+        @keyframes hbd-f{
+          0%{transform:translateX(-80px) translateY(0)}
+          25%{transform:translateX(25vw) translateY(-10px)}
+          50%{transform:translateX(50vw) translateY(5px)}
+          75%{transform:translateX(75vw) translateY(-7px)}
+          100%{transform:translateX(calc(100vw + 80px)) translateY(3px)}}
 
-        /* Mountains */
-        .zen-mts { position:absolute; bottom:0; left:0; right:0; z-index:8; pointer-events:none; }
+        /* MOUNTAINS */
+        .h-mts{position:absolute;bottom:0;left:0;right:0;z-index:8;pointer-events:none}
 
-        /* River shimmer */
-        @keyframes zr-flow {
-          0% { stroke-dashoffset: 0; }
-          100% { stroke-dashoffset: -60; }
-        }
-        @keyframes zr-shine {
-          0%,100% { opacity:.3; }
-          50% { opacity:.7; }
-        }
+        /* RIVER SHIMMER */
+        @keyframes rv-flow{0%{stroke-dashoffset:0}100%{stroke-dashoffset:-80}}
 
-        /* Mist */
-        .zen-mist {
-          position:absolute; bottom:0; left:0; right:0; height:35%;
-          background: linear-gradient(to top, ${C.mist}, transparent);
-          z-index:12; pointer-events:none;
-          animation: zm-drift 10s ease-in-out infinite alternate;
-        }
-        @keyframes zm-drift { 0%{opacity:.35;transform:translateX(-0.5%)} 100%{opacity:.6;transform:translateX(0.5%)} }
+        /* MIST */
+        .h-mist{position:absolute;bottom:0;left:-3%;right:-3%;height:30%;z-index:12;pointer-events:none;
+          background:linear-gradient(to top,${C.mist},${C.mist},transparent);
+          animation:mist-mv 12s ease-in-out infinite alternate}
+        .h-mist2{animation-direction:alternate-reverse;animation-duration:16s;height:18%;bottom:8%;opacity:.5}
+        @keyframes mist-mv{0%{opacity:.3;transform:translateX(-0.8%)}100%{opacity:.55;transform:translateX(0.8%)}}
 
-        /* Particles */
-        .zen-p { position:absolute; border-radius:50%; z-index:5; pointer-events:none; animation:zp-float linear infinite; }
-        @keyframes zp-float {
+        /* PARTICLES */
+        .hpt{position:absolute;border-radius:50%;z-index:5;pointer-events:none;animation:hpt-f linear infinite;
+          ${N?'box-shadow:0 0 4px 1px rgba(150,180,255,.3)':''}}
+        @keyframes hpt-f{
           0%{transform:translateY(0) translateX(0);opacity:0}
-          10%{opacity:var(--po)}
-          90%{opacity:var(--po)}
-          100%{transform:translateY(-100vh) translateX(var(--pd));opacity:0}
-        }
+          8%{opacity:var(--po)}92%{opacity:var(--po)}
+          100%{transform:translateY(-100vh) translateX(var(--pd));opacity:0}}
 
-        /* Night stars */
-        .zen-star { position:absolute; background:#fff; border-radius:50%; z-index:3;
-          animation: zs-twinkle 3s ease-in-out infinite alternate; }
-        @keyframes zs-twinkle { 0%{opacity:.1;transform:scale(.4)} 100%{opacity:.7;transform:scale(1)} }
+        /* STARS */
+        .hst{position:absolute;background:#fff;border-radius:50%;z-index:3;animation:hst-t 3s ease-in-out infinite alternate}
+        @keyframes hst-t{0%{opacity:.06;transform:scale(.3)}100%{opacity:.6;transform:scale(1)}}
+        .h-shoot{position:absolute;top:14%;left:52%;width:3px;height:3px;background:#fff;border-radius:50%;z-index:4;animation:h-sh 11s ease-in infinite}
+        .h-shoot::after{content:'';position:absolute;width:55px;height:1.5px;background:linear-gradient(to left,transparent,rgba(255,255,255,.4));right:3px;transform:rotate(-35deg);transform-origin:right}
+        @keyframes h-sh{0%{transform:translate(0,0);opacity:0}2%{opacity:1}7%{transform:translate(-200px,100px);opacity:0}100%{opacity:0}}
 
-        .zen-shoot { position:absolute; top:16%; left:58%; width:3px; height:3px;
-          background:#fff; border-radius:50%; z-index:4; animation: zsh 9s ease-in infinite; }
-        .zen-shoot::after { content:''; position:absolute; width:45px; height:1.5px;
-          background:linear-gradient(to left,transparent,rgba(255,255,255,.45)); right:3px;
-          transform:rotate(-35deg); transform-origin:right; }
-        @keyframes zsh { 0%{transform:translate(0,0);opacity:0} 3%{opacity:1} 9%{transform:translate(-160px,80px);opacity:0} 100%{opacity:0} }
-
-        /* Windmill */
-        @keyframes wm-spin { to{transform:rotate(360deg)} }
-        .wm-wrap { position:absolute; bottom:24%; right:18%; z-index:11; width:32px; }
-        .wm-body { width:16px; height:58px; background:${C.house}; position:absolute; bottom:0; left:8px; border-radius:2px 2px 0 0; }
-        .wm-body::before { content:''; position:absolute; width:6px; height:6px; left:5px; top:15px;
-          background:#FDC500; box-shadow:0 0 8px rgba(253,197,0,.4),0 13px 0 #FDC500,0 13px 8px rgba(253,197,0,.3); }
-        .wm-roof { width:0; height:0; border-left:12px solid transparent; border-right:12px solid transparent;
-          border-bottom:15px solid ${C.houseRoof}; position:absolute; bottom:58px; left:4px; }
-        .wm-spinner { position:absolute; bottom:47px; left:13px; width:6px; height:6px; animation:wm-spin 5s linear infinite; z-index:2; }
-        .wm-hub { width:6px; height:6px; border-radius:50%; background:${C.house}; }
-        .wm-blade { position:absolute; width:2.5px; height:32px; background:${C.house}; left:1.75px; top:3px; transform-origin:1.25px 0; }
-        .wm-b0{transform:rotate(0deg)} .wm-b1{transform:rotate(90deg)} .wm-b2{transform:rotate(180deg)} .wm-b3{transform:rotate(270deg)}
+        /* WINDMILL */
+        @keyframes wm-s{to{transform:rotate(360deg)}}
+        .wm-w{position:absolute;bottom:26%;right:16%;z-index:10;width:28px}
+        .wm-bd{width:14px;height:52px;background:${C.house};position:absolute;bottom:0;left:7px;border-radius:2px 2px 0 0}
+        .wm-bd::before{content:'';position:absolute;width:5px;height:5px;left:4.5px;top:14px;background:#FDC500;box-shadow:0 0 6px rgba(253,197,0,.4),0 12px 0 #FDC500,0 12px 6px rgba(253,197,0,.3)}
+        .wm-rf{width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-bottom:14px solid ${C.roof};position:absolute;bottom:52px;left:3px}
+        .wm-sp{position:absolute;bottom:42px;left:11px;width:6px;height:6px;animation:wm-s 5s linear infinite;z-index:2}
+        .wm-hb{width:6px;height:6px;border-radius:50%;background:${C.house}}
+        .wm-bl{position:absolute;width:2px;height:28px;background:${C.house};left:2px;top:3px;transform-origin:1px 0}
+        .wm-b0{transform:rotate(0deg)}.wm-b1{transform:rotate(90deg)}.wm-b2{transform:rotate(180deg)}.wm-b3{transform:rotate(270deg)}
       `}</style>
 
-      <div className="zen-bg">
-        <div className="zen-aurora"/>
-        <div className="zen-orb"/>
+      <div className="hbg">
+        {/* Sun rays */}
+        <div className="h-rays"/>
 
-        {/* Night extras */}
+        {/* Orb */}
+        <div className="h-orb"/>
+
+        {/* Night */}
         {N && <>
-          {Array.from({length:50},(_,i)=>(
-            <div key={i} className="zen-star" style={{
-              left:`${Math.random()*100}%`, top:`${Math.random()*42}%`,
-              width:1+Math.random()*2.5, height:1+Math.random()*2.5,
-              animationDelay:`${Math.random()*4}s`, animationDuration:`${2+Math.random()*3}s`,
-            }}/>
+          {Array.from({length:60},(_,i)=>(
+            <div key={i} className="hst" style={{left:`${Math.random()*100}%`,top:`${Math.random()*42}%`,width:1+Math.random()*2.5,height:1+Math.random()*2.5,animationDelay:`${Math.random()*4}s`,animationDuration:`${2+Math.random()*3}s`}}/>
           ))}
-          <div className="zen-shoot"/>
+          <div className="h-shoot"/>
         </>}
 
         {/* Clouds */}
         {clouds.map(c=>(
-          <svg key={c.id} className="zen-cloud" style={{
-            top:`${c.top}%`, width:c.size, opacity:c.opacity,
-            animationDuration:`${c.duration}s`, animationDelay:`${c.delay}s`,
-          }} viewBox="0 0 220 80" fill="none">
-            <ellipse cx="110" cy="48" rx="90" ry="26" fill={C.cloud}/>
-            <ellipse cx="70" cy="38" rx="55" ry="24" fill={C.cloud}/>
-            <ellipse cx="150" cy="40" rx="60" ry="22" fill={C.cloud}/>
-            <ellipse cx="100" cy="32" rx="48" ry="22" fill={C.cloud}/>
+          <svg key={c.id} className="hcl" style={{top:`${c.top}%`,width:c.w,opacity:c.op,animationDuration:`${c.dur}s`,animationDelay:`${c.del}s`}} viewBox="0 0 240 90" fill="none">
+            <ellipse cx="120" cy="55" rx="105" ry="30" fill={C.cloud}/>
+            <ellipse cx="72" cy="42" rx="65" ry="28" fill={C.cloud}/>
+            <ellipse cx="165" cy="44" rx="68" ry="26" fill={C.cloud}/>
+            <ellipse cx="115" cy="32" rx="58" ry="26" fill={C.cloud}/>
+            <ellipse cx="145" cy="28" rx="42" ry="20" fill={C.cloud}/>
           </svg>
         ))}
 
         {/* Birds */}
         {birds.map(b=>(
-          <svg key={b.id} className="zen-bird" style={{
-            top:`${b.top}%`, width:b.size,
-            animationDuration:`${b.duration}s`, animationDelay:`${b.delay}s`,
-          }} viewBox="0 0 44 18" fill="none">
-            <path d="M2 9 Q6 3 10 7 Q14 3 18 9" stroke={C.bird} strokeWidth="1.4" fill="none" strokeLinecap="round"/>
-            <path d="M13 13 Q16 8 19 11 Q22 8 25 13" stroke={C.bird} strokeWidth="1.1" fill="none" strokeLinecap="round"/>
-            <path d="M24 7 Q27 2 30 5 Q33 2 36 7" stroke={C.bird} strokeWidth="0.9" fill="none" strokeLinecap="round"/>
+          <svg key={b.id} className="hbd" style={{top:`${b.top}%`,width:b.s,animationDuration:`${b.dur}s`,animationDelay:`${b.del}s`}} viewBox="0 0 44 18" fill="none">
+            <path d="M2 9Q6 3 10 7Q14 3 18 9" stroke={C.bird} strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            <path d="M13 13Q16 8 19 11Q22 8 25 13" stroke={C.bird} strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+            <path d="M24 7Q27 2 30 5Q33 2 36 7" stroke={C.bird} strokeWidth="1" fill="none" strokeLinecap="round"/>
           </svg>
         ))}
 
         {/* Particles */}
         {particles.map((p,i)=>(
-          <div key={i} className="zen-p" style={{
-            left:`${p.x}%`, bottom:'-2%', width:p.size, height:p.size,
-            background:`rgba(${C.particle},${p.opacity})`,
-            animationDuration:`${p.dur}s`, animationDelay:`${p.delay}s`,
-            '--po':p.opacity, '--pd':`${p.drift}px`,
-          }}/>
+          <div key={i} className="hpt" style={{left:`${p.x}%`,bottom:'-2%',width:p.s,height:p.s,background:`rgba(${C.part},${p.op})`,animationDuration:`${p.dur}s`,animationDelay:`${p.del}s`,'--po':p.op,'--pd':`${p.dr}px`}}/>
         ))}
 
-        {/* ═══ REALISTIC MOUNTAIN LANDSCAPE ═══ */}
-        <svg className="zen-mts" viewBox="0 0 1600 360" preserveAspectRatio="none" style={{width:'100%',height:'50%'}}>
+        {/* ═══ LANDSCAPE ═══ */}
+        <svg className="h-mts" viewBox="0 0 1600 400" preserveAspectRatio="none" style={{width:'100%',height:'55%'}}>
           <defs>
-            <linearGradient id="zm1" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={C.mt1a} stopOpacity=".5"/>
-              <stop offset="100%" stopColor={C.mt1b} stopOpacity=".8"/>
-            </linearGradient>
-            <linearGradient id="zm2" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={C.mt2a} stopOpacity=".65"/>
-              <stop offset="100%" stopColor={C.mt2b} stopOpacity=".92"/>
-            </linearGradient>
-            <linearGradient id="zm3" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={C.mt3a} stopOpacity=".8"/>
-              <stop offset="100%" stopColor={C.mt3b} stopOpacity=".97"/>
-            </linearGradient>
-            <linearGradient id="zm4" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={C.mt4a} stopOpacity=".9"/>
-              <stop offset="100%" stopColor={C.mt4b} stopOpacity="1"/>
-            </linearGradient>
-            <linearGradient id="zriv" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor={C.river}/>
-              <stop offset="50%" stopColor={C.riverShine}/>
-              <stop offset="100%" stopColor={C.river}/>
-            </linearGradient>
+            <linearGradient id="mg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={C.m1} stopOpacity=".5"/><stop offset="100%" stopColor={C.m1b} stopOpacity=".8"/></linearGradient>
+            <linearGradient id="mg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={C.m2} stopOpacity=".65"/><stop offset="100%" stopColor={C.m2b} stopOpacity=".9"/></linearGradient>
+            <linearGradient id="mg3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={C.m3} stopOpacity=".8"/><stop offset="100%" stopColor={C.m3b} stopOpacity=".96"/></linearGradient>
+            <linearGradient id="mg4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={C.m4} stopOpacity=".92"/><stop offset="100%" stopColor={C.m4b} stopOpacity="1"/></linearGradient>
+            <linearGradient id="rvg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor={C.river}/><stop offset="50%" stopColor={C.rivShine}/><stop offset="100%" stopColor={C.river}/></linearGradient>
           </defs>
 
-          {/* Layer 1: Far snowy peaks */}
-          <path d="M0 210 L60 170 L120 145 L180 165 L260 90 L310 120 L380 75 L440 140 L500 100 L560 130 L640 60 L720 110 L790 85 L860 135 L940 50 L1010 95 L1080 70 L1140 120 L1220 55 L1300 100 L1360 80 L1420 130 L1500 95 L1560 115 L1600 140 L1600 360 L0 360Z"
-            fill="url(#zm1)"/>
-          {/* Snow caps on tallest peaks */}
-          <path d="M255 95 L260 90 L265 93Z" fill={C.snow} opacity=".7"/>
-          <path d="M375 80 L380 75 L385 79Z" fill={C.snow} opacity=".7"/>
-          <path d="M635 65 L640 60 L645 64Z" fill={C.snow} opacity=".7"/>
-          <path d="M935 55 L940 50 L945 54Z" fill={C.snow} opacity=".7"/>
-          <path d="M1215 60 L1220 55 L1225 59Z" fill={C.snow} opacity=".7"/>
+          {/* Layer 1: Far peaks */}
+          <path d="M0 235 L55 195 L115 165 L175 185 L250 100 L310 138 L375 85 L435 158 L500 115 L560 148 L640 70 L710 125 L780 95 L850 152 L930 60 L1000 108 L1070 80 L1140 135 L1220 62 L1300 112 L1365 88 L1425 142 L1500 105 L1560 128 L1600 155 L1600 400 L0 400Z" fill="url(#mg1)"/>
+          {[[248,103],[373,88],[638,73],[928,63],[1218,65]].map(([x,y],i)=><polygon key={i} points={`${x-7},${y+6} ${x},${y} ${x+7},${y+6}`} fill={C.snow}/>)}
 
-          {/* Layer 2: Mid mountains with ridgeline texture */}
-          <path d="M0 240 Q80 195 160 215 Q240 175 340 200 Q420 168 520 195 Q600 178 700 200 Q780 172 880 198 Q960 175 1060 195 Q1140 170 1240 195 Q1320 180 1420 200 Q1500 185 1600 200 L1600 360 L0 360Z"
-            fill="url(#zm2)"/>
+          {/* Layer 2: Mid mountains */}
+          <path d="M0 262 Q95 218 190 238 Q275 195 375 225 Q455 190 555 218 Q635 198 735 222 Q815 192 915 218 Q995 195 1095 218 Q1175 192 1275 215 Q1355 200 1455 222 Q1535 208 1600 222 L1600 400 L0 400Z" fill="url(#mg2)"/>
 
-          {/* Tree line silhouettes on mid mountains */}
-          <path d="M0 238 q4 -6 8 0 q4 -8 8 0 q4 -5 8 0 q4 -7 8 0 q4 -6 8 0 q4 -9 8 0 q4 -5 8 0 q4 -7 8 0 q4 -6 8 0 q4 -8 8 0 q4 -5 8 0 q4 -7 8 0 q4 -6 8 0 q4 -9 8 0 q4 -5 8 0 q4 -7 8 0 q4 -6 8 0 q4 -8 8 0 q4 -5 8 0 q4 -7 8 0"
-            fill="none" stroke={C.treeLine} strokeWidth="3" opacity=".4"
-            transform="translate(100, -2)"/>
-          <path d="M0 238 q4 -6 8 0 q4 -8 8 0 q4 -5 8 0 q4 -7 8 0 q4 -6 8 0 q4 -9 8 0 q4 -5 8 0 q4 -7 8 0 q4 -6 8 0 q4 -8 8 0 q4 -5 8 0 q4 -7 8 0 q4 -6 8 0 q4 -9 8 0 q4 -5 8 0 q4 -7 8 0 q4 -6 8 0 q4 -8 8 0 q4 -5 8 0 q4 -7 8 0"
-            fill="none" stroke={C.treeLine} strokeWidth="3" opacity=".4"
-            transform="translate(700, 5)"/>
+          {/* Pine trees on ridge */}
+          {Array.from({length:45},(_,i)=>{const x=i*38+Math.random()*18;const h=10+Math.random()*16;const y=256-Math.random()*10;
+            return <polygon key={`p${i}`} points={`${x},${y} ${x+h*.35},${y-h} ${x+h*.7},${y}`} fill={C.tree} opacity={.3+Math.random()*.3}/>;
+          })}
 
           {/* Layer 3: Near hills */}
-          <path d="M0 275 Q120 240 250 258 Q380 230 520 252 Q640 238 760 255 Q880 240 1000 255 Q1120 238 1250 252 Q1380 242 1480 258 Q1550 248 1600 255 L1600 360 L0 360Z"
-            fill="url(#zm3)"/>
+          <path d="M0 298 Q140 262 290 280 Q420 252 560 275 Q680 260 800 278 Q920 262 1040 278 Q1160 260 1290 275 Q1420 265 1520 280 Q1570 270 1600 278 L1600 400 L0 400Z" fill="url(#mg3)"/>
 
-          {/* Layer 4: Foreground base */}
-          <path d="M0 305 Q200 285 400 295 Q600 280 800 292 Q1000 282 1200 293 Q1400 286 1600 295 L1600 360 L0 360Z"
-            fill="url(#zm4)"/>
+          {/* Near trees */}
+          {Array.from({length:35},(_,i)=>{const x=i*48+Math.random()*25;const h=7+Math.random()*12;const y=294-Math.random()*6;
+            return <polygon key={`n${i}`} points={`${x},${y} ${x+h*.3},${y-h} ${x+h*.6},${y}`} fill={C.tree} opacity={.35+Math.random()*.3}/>;
+          })}
 
-          {/* ═══ HOUSE on the hillside ═══ */}
-          <g transform="translate(420, 235)">
-            {/* House body */}
-            <rect x="0" y="8" width="22" height="18" fill={C.house} rx="1"/>
+          {/* Layer 4: Foreground */}
+          <path d="M0 328 Q240 310 480 320 Q720 305 960 318 Q1200 308 1380 320 Q1500 312 1600 320 L1600 400 L0 400Z" fill="url(#mg4)"/>
+
+          {/* ══════ DETAILED HOUSE ══════ */}
+          <g transform="translate(320, 245)">
+            {/* Foundation/base */}
+            <rect x="-2" y="30" width="54" height="5" fill={N?'#0a1018':'#4a3a28'} rx="1" opacity=".6"/>
+            {/* Main house body */}
+            <rect x="0" y="5" width="50" height="28" fill={C.house} rx="1"/>
+            {/* Side shadow for depth */}
+            <rect x="42" y="5" width="8" height="28" fill={N?'#0c1520':'#5a4838'} rx="0" opacity=".3"/>
             {/* Roof */}
-            <polygon points="-3,8 11,-4 25,8" fill={C.houseRoof}/>
+            <polygon points="-6,5 25,-14 56,5" fill={C.roof}/>
+            <polygon points="-6,5 25,-14 25,-11 -4,6" fill={N?'#12181f':'#544030'} opacity=".3"/>
             {/* Chimney */}
-            <rect x="16" y="-2" width="4" height="8" fill={C.house}/>
+            <rect x="36" y="-12" width="8" height="16" fill={C.house}/>
+            <rect x="34" y="-14" width="12" height="3" fill={C.roof} rx=".5"/>
+            {/* Chimney brick lines */}
+            <line x1="36" y1="-8" x2="44" y2="-8" stroke={N?'#1a2438':'#7a6850'} strokeWidth=".5" opacity=".4"/>
+            <line x1="36" y1="-4" x2="44" y2="-4" stroke={N?'#1a2438':'#7a6850'} strokeWidth=".5" opacity=".4"/>
+            <line x1="36" y1="0" x2="44" y2="0" stroke={N?'#1a2438':'#7a6850'} strokeWidth=".5" opacity=".4"/>
+            
+            {/* Smoke puffs — staggered */}
+            <circle cx="40" cy="-18" r="3.5" fill={C.cloud} opacity=".18">
+              <animate attributeName="cy" values="-18;-38" dur="4s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values=".18;0" dur="4s" repeatCount="indefinite"/>
+              <animate attributeName="r" values="3.5;9" dur="4s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="41" cy="-24" r="2.5" fill={C.cloud} opacity=".12">
+              <animate attributeName="cy" values="-24;-48" dur="5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values=".12;0" dur="5s" repeatCount="indefinite"/>
+              <animate attributeName="r" values="2.5;7" dur="5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="39" cy="-14" r="2" fill={C.cloud} opacity=".1">
+              <animate attributeName="cy" values="-14;-32" dur="3.5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values=".1;0" dur="3.5s" repeatCount="indefinite"/>
+              <animate attributeName="r" values="2;6" dur="3.5s" repeatCount="indefinite"/>
+            </circle>
+
             {/* Door */}
-            <rect x="8" y="16" width="6" height="10" fill={N?'#0a0e16':'#3a2a1a'} rx="1"/>
-            {/* Windows (glowing at night) */}
-            <rect x="2" y="12" width="4" height="4" fill={C.houseWin} rx=".5"
-              opacity={N?1:.7}/>
-            <rect x="16" y="12" width="4" height="4" fill={C.houseWin} rx=".5"
-              opacity={N?1:.7}/>
-            {/* Window glow */}
-            {N && <>
-              <rect x="1" y="11" width="6" height="6" fill={C.houseWin} opacity=".15" rx="1" filter="url(#blur)"/>
-              <rect x="15" y="11" width="6" height="6" fill={C.houseWin} opacity=".15" rx="1" filter="url(#blur)"/>
+            <rect x="20" y="17" width="10" height="16" fill={N?'#080c14':'#3a2818'} rx="1.5"/>
+            <circle cx="28" cy="26" r=".8" fill={C.win} opacity=".7"/>
+            {/* Porch awning */}
+            <path d="M16 17 L25 13 L34 17" fill="none" stroke={C.roof} strokeWidth="1.5"/>
+
+            {/* Windows — larger with frames */}
+            <rect x="4" y="12" width="10" height="8" fill={C.win} rx="1" opacity={N?1:.65}/>
+            <rect x="36" y="12" width="10" height="8" fill={C.win} rx="1" opacity={N?1:.65}/>
+            {/* Window frames (cross) */}
+            <line x1="9" y1="12" x2="9" y2="20" stroke={C.house} strokeWidth=".8"/>
+            <line x1="4" y1="16" x2="14" y2="16" stroke={C.house} strokeWidth=".8"/>
+            <line x1="41" y1="12" x2="41" y2="20" stroke={C.house} strokeWidth=".8"/>
+            <line x1="36" y1="16" x2="46" y2="16" stroke={C.house} strokeWidth=".8"/>
+            {/* Window glow at night */}
+            {N&&<>
+              <rect x="2" y="10" width="14" height="12" fill={C.win} opacity=".12" rx="2"/>
+              <rect x="34" y="10" width="14" height="12" fill={C.win} opacity=".12" rx="2"/>
             </>}
+
+            {/* Stone path from door */}
+            {[0,6,12,18].map(d=><ellipse key={d} cx={25} cy={35+d} rx={3-d*.08} ry={1.2} fill={N?'#1a2030':'#8a7a68'} opacity=".35"/>)}
+
+            {/* Fence */}
+            {[-8,-4,54,58,62].map(x=><rect key={x} x={x} y={22} width={1.5} height={11} fill={C.house} opacity=".4" rx=".3"/>)}
+            <rect x="-9" y="25" width="14" height="1" fill={C.house} opacity=".3"/>
+            <rect x="53" y="25" width="12" height="1" fill={C.house} opacity=".3"/>
+
+            {/* Flower pots */}
+            <circle cx="-5" cy="30" r="2" fill={N?'#2a1520':'#d44'} opacity=".5"/>
+            <circle cx="57" cy="30" r="2" fill={N?'#1a2a20':'#4a4'} opacity=".5"/>
           </g>
 
-          {/* Small trees near house */}
-          <g transform="translate(400, 245)" opacity=".7">
-            <polygon points="0,0 4,-12 8,0" fill={C.treeLine}/>
-            <rect x="3" y="0" width="2" height="4" fill={C.house}/>
-          </g>
-          <g transform="translate(450, 242)" opacity=".7">
-            <polygon points="0,0 5,-14 10,0" fill={C.treeLine}/>
-            <rect x="4" y="0" width="2" height="5" fill={C.house}/>
-          </g>
-          <g transform="translate(460, 246)" opacity=".6">
-            <polygon points="0,0 3,-10 6,0" fill={C.treeLine}/>
-            <rect x="2" y="0" width="2" height="3" fill={C.house}/>
-          </g>
+          {/* Trees near house — varied sizes */}
+          {[[290,265,18],[300,270,12],[380,260,20],[395,267,13],[400,272,9]].map(([x,y,h],i)=>(
+            <g key={`ht${i}`} opacity={.5+i*.08}>
+              <polygon points={`${x},${y} ${x+h*.35},${y-h} ${x+h*.7},${y}`} fill={C.tree}/>
+              {h>14&&<polygon points={`${x+h*.1},${y-h*.3} ${x+h*.35},${y-h*.85} ${x+h*.6},${y-h*.3}`} fill={C.tree} opacity=".7"/>}
+              <rect x={x+h*.3} y={y} width={h*.12} height={h*.25} fill={C.house} opacity=".35"/>
+            </g>
+          ))}
 
-          {/* ═══ REALISTIC RIVER ═══ */}
-          {/* River body — filled shape that widens toward foreground for perspective */}
-          <path d="M690 195 Q710 210 725 232 Q738 252 755 266 Q780 280 820 288 Q870 296 940 300 Q1040 304 1160 308 Q1300 314 1420 320 Q1520 325 1600 330 L1600 340 Q1520 335 1420 330 Q1300 324 1160 318 Q1040 314 940 310 Q870 306 820 298 Q780 290 758 278 Q742 264 730 244 Q718 224 700 208 Z"
-            fill="url(#zriv)" opacity=".7"/>
+          {/* ══════ WIDE REALISTIC RIVER ══════ */}
+          {/* River body — very wide, perspective widening */}
+          <path d="M580 215 Q620 235 645 260 Q668 285 700 302 Q750 318 830 328 Q940 338 1080 344 Q1250 352 1400 358 Q1530 365 1600 372 L1600 395 Q1530 388 1400 382 Q1250 376 1080 370 Q940 365 830 358 Q750 350 708 338 Q678 325 658 302 Q640 278 612 250 Q592 232 570 218 Z" fill="url(#rvg)" opacity=".65"/>
           {/* Deeper center channel */}
-          <path d="M694 198 Q712 213 727 235 Q740 254 757 268 Q782 282 822 290 Q872 298 942 302 Q1042 306 1162 310 Q1302 316 1422 322 Q1522 327 1600 332 L1600 336 Q1522 331 1422 326 Q1302 320 1162 314 Q1042 310 942 306 Q872 302 822 294 Q782 286 760 274 Q744 260 732 240 Q720 220 702 206 Z"
-            fill={C.riverShine} opacity=".15"/>
+          <path d="M588 220 Q625 240 650 264 Q672 288 705 305 Q755 320 835 330 Q945 340 1085 346 Q1255 354 1405 360 Q1535 367 1600 374 L1600 388 Q1535 381 1405 375 Q1255 369 1085 363 Q945 358 835 350 Q755 342 712 332 Q682 320 664 298 Q648 275 622 248 Q600 230 582 216 Z" fill={C.rivShine} opacity=".12"/>
 
-          {/* Animated shimmer reflections — light dancing on water */}
-          <path d="M695 200 Q715 218 730 240 Q745 258 762 272 Q790 285 830 293 Q880 300 950 304 Q1060 308 1180 312 Q1320 318 1440 324 Q1540 329 1600 334"
-            fill="none" stroke={C.riverShine} strokeWidth="3" strokeLinecap="round"
-            strokeDasharray="12 18 6 22"
-            opacity=".45"
-            style={{animation:'zr-flow 2.5s linear infinite'}}/>
-          <path d="M695 200 Q715 218 730 240 Q745 258 762 272 Q790 285 830 293 Q880 300 950 304 Q1060 308 1180 312 Q1320 318 1440 324 Q1540 329 1600 334"
-            fill="none" stroke={C.riverShine} strokeWidth="1.5" strokeLinecap="round"
-            strokeDasharray="4 20 8 16"
-            opacity=".3"
-            style={{animation:'zr-flow 4s linear infinite', animationDelay:'-2s'}}/>
-          <path d="M698 204 Q716 220 732 242 Q748 260 764 274 Q792 287 832 295 Q882 302 952 306 Q1062 310 1182 314 Q1322 320 1440 326 Q1540 331 1600 336"
-            fill="none" stroke={C.riverShine} strokeWidth="2" strokeLinecap="round"
-            strokeDasharray="3 25 10 14"
-            opacity=".2"
-            style={{animation:'zr-flow 5.5s linear infinite', animationDelay:'-3.5s'}}/>
+          {/* Multiple shimmer layers */}
+          <path d="M590 222 Q628 242 652 266 Q674 290 708 306 Q758 322 838 332 Q948 342 1088 348 Q1258 356 1408 362 Q1538 369 1600 376" fill="none" stroke={C.rivShine} strokeWidth="4" strokeLinecap="round" strokeDasharray="18 24 10 28" opacity=".4" style={{animation:'rv-flow 2.2s linear infinite'}}/>
+          <path d="M595 228 Q630 246 655 270 Q678 294 712 310 Q762 326 842 336 Q952 346 1092 352 Q1262 360 1412 366 Q1542 373 1600 380" fill="none" stroke={C.rivShine} strokeWidth="2.5" strokeLinecap="round" strokeDasharray="6 26 14 20" opacity=".28" style={{animation:'rv-flow 4s linear infinite',animationDelay:'-1.5s'}}/>
+          <path d="M585 218 Q624 238 648 262 Q670 286 704 302 Q754 318 834 328 Q944 338 1084 344 Q1254 352 1404 358 Q1534 365 1600 372" fill="none" stroke={C.rivShine} strokeWidth="1.5" strokeLinecap="round" strokeDasharray="4 30 8 22" opacity=".18" style={{animation:'rv-flow 6s linear infinite',animationDelay:'-3s'}}/>
 
-          {/* Ripple marks (small ellipses on the water surface) */}
-          <ellipse cx="780" cy="282" rx="8" ry="2" fill="none" stroke={C.riverShine} strokeWidth=".8" opacity=".3">
-            <animate attributeName="rx" values="6;10;6" dur="3s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values=".3;.1;.3" dur="3s" repeatCount="indefinite"/>
-          </ellipse>
-          <ellipse cx="920" cy="298" rx="10" ry="2.5" fill="none" stroke={C.riverShine} strokeWidth=".8" opacity=".25">
-            <animate attributeName="rx" values="8;13;8" dur="4s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values=".25;.08;.25" dur="4s" repeatCount="indefinite"/>
-          </ellipse>
-          <ellipse cx="1100" cy="309" rx="12" ry="3" fill="none" stroke={C.riverShine} strokeWidth=".7" opacity=".2">
-            <animate attributeName="rx" values="10;15;10" dur="3.5s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values=".2;.06;.2" dur="3.5s" repeatCount="indefinite"/>
-          </ellipse>
-          <ellipse cx="1320" cy="318" rx="14" ry="3" fill="none" stroke={C.riverShine} strokeWidth=".6" opacity=".18">
-            <animate attributeName="rx" values="12;18;12" dur="4.5s" repeatCount="indefinite"/>
-          </ellipse>
+          {/* Rocks in river */}
+          {[[620,248,4],[680,290,3.5],[740,315,4.5],[850,332,3],[960,340,4],[1120,348,3.5]].map(([x,y,r],i)=>(
+            <g key={`rk${i}`}>
+              <ellipse cx={x} cy={y} rx={r} ry={r*.6} fill={N?'#1a2030':'#6a6050'} opacity=".45"/>
+              <ellipse cx={x-.5} cy={y-.5} rx={r*.6} ry={r*.35} fill={N?'#2a3040':'#8a7a68'} opacity=".3"/>
+            </g>
+          ))}
 
-          {/* River banks — soft vegetation edges */}
-          <path d="M688 194 Q708 208 722 230 Q735 250 752 264 Q778 278 818 286 Q868 294 938 298 Q1038 302 1158 306 Q1298 312 1418 318 Q1518 323 1600 328"
-            fill="none" stroke={C.treeLine} strokeWidth="2.5" opacity=".25" strokeLinecap="round"/>
-          <path d="M702 210 Q720 226 735 246 Q748 264 765 278 Q790 290 830 298 Q880 306 950 310 Q1050 314 1170 318 Q1310 324 1430 330 Q1530 335 1600 340"
-            fill="none" stroke={C.treeLine} strokeWidth="2" opacity=".2" strokeLinecap="round"/>
+          {/* Animated ripples — more of them */}
+          {[[650,262],[730,308],[820,326],[920,336],[1050,344],[1200,352],[1380,362]].map(([cx,cy],i)=>(
+            <ellipse key={`rp${i}`} cx={cx} cy={cy} rx={10+i*2} ry={2.2} fill="none" stroke={C.rivShine} strokeWidth=".8" opacity=".22">
+              <animate attributeName="rx" values={`${8+i*2};${15+i*2};${8+i*2}`} dur={`${2.5+i*.4}s`} repeatCount="indefinite"/>
+              <animate attributeName="opacity" values=".22;.05;.22" dur={`${2.5+i*.4}s`} repeatCount="indefinite"/>
+            </ellipse>
+          ))}
 
-          {/* Small bushes along near bank */}
-          {[{x:800,y:290},{x:860,y:296},{x:950,y:302},{x:1060,y:308},{x:1200,y:314},{x:1350,y:322}].map((b,i)=>
-            <g key={i} transform={`translate(${b.x},${b.y})`} opacity=".4">
-              <ellipse cx="0" cy="0" rx={4+i%3} ry={3+i%2} fill={C.treeLine}/>
+          {/* Wooden bridge with railings */}
+          <g transform="translate(810, 324)" opacity=".6">
+            <path d="M-18 6Q-12 -8 0 -10Q12 -8 18 6" fill="none" stroke={N?'#2a3040':'#6b5a48'} strokeWidth="3" strokeLinecap="round"/>
+            <rect x="-20" y="-12" width="40" height="3.5" rx="1" fill={N?'#1e2838':'#7a6850'}/>
+            {/* Planks */}
+            {[-16,-10,-4,2,8,14].map(px=><rect key={px} x={px} y={-12} width="2" height="3.5" fill={N?'#2a3848':'#8a7860'} opacity=".4"/>)}
+            {/* Railing posts */}
+            <rect x="-19" y="-20" width="2" height="10" fill={N?'#2a3040':'#6b5a48'} rx=".5"/>
+            <rect x="17" y="-20" width="2" height="10" fill={N?'#2a3040':'#6b5a48'} rx=".5"/>
+            <rect x="-19" y="-20" width="38" height="1.5" rx=".5" fill={N?'#2a3040':'#6b5a48'}/>
+          </g>
+
+          {/* Bank vegetation — lush */}
+          {[[600,240],[660,278],[720,310],[780,322],[850,330],[930,338],[1020,342],[1120,348],[1240,354],[1360,362],[1480,368]].map(([x,y],i)=>
+            <g key={`bv${i}`}>
+              <ellipse cx={x} cy={y} rx={5+i%4} ry={3+i%2} fill={C.tree} opacity=".35"/>
+              {i%3===0&&<ellipse cx={x+3} cy={y-1} rx={3} ry={2} fill={C.tree} opacity=".25"/>}
             </g>
           )}
 
-          {/* Small stone bridge crossing the river */}
-          <g transform="translate(885, 290)" opacity=".6">
-            {/* Bridge arch */}
-            <path d="M-14 5 Q-10 -6 0 -8 Q10 -6 14 5" fill="none" stroke={N?'#2a3040':'#6b5a48'} strokeWidth="3" strokeLinecap="round"/>
-            {/* Bridge surface */}
-            <rect x="-15" y="-9" width="30" height="3" rx="1" fill={N?'#222838':'#7a6850'}/>
-            {/* Stone texture dots */}
-            <circle cx="-8" cy="-8" r=".8" fill={N?'#3a4050':'#8a7860'} opacity=".6"/>
-            <circle cx="0" cy="-8" r=".8" fill={N?'#3a4050':'#8a7860'} opacity=".6"/>
-            <circle cx="8" cy="-8" r=".8" fill={N?'#3a4050':'#8a7860'} opacity=".6"/>
-          </g>
+          {/* Wildflowers scattered */}
+          {!N&&[[310,278],[340,282],[470,274],[500,276],[560,280]].map(([x,y],i)=>
+            <circle key={`fl${i}`} cx={x} cy={y} r={1.2} fill={['#e74c3c','#f39c12','#9b59b6','#e74c3c','#3498db'][i]} opacity=".5"/>
+          )}
         </svg>
 
-        {/* Mist layer */}
-        <div className="zen-mist"/>
+        <div className="h-mist"/>
+        <div className="h-mist h-mist2"/>
 
-        {/* Windmill */}
-        <div className="wm-wrap">
-          <div className="wm-roof"/>
-          <div className="wm-spinner">
-            <div className="wm-hub"/>
-            <div className="wm-blade wm-b0"/>
-            <div className="wm-blade wm-b1"/>
-            <div className="wm-blade wm-b2"/>
-            <div className="wm-blade wm-b3"/>
-          </div>
-          <div className="wm-body"/>
+        <div className="wm-w">
+          <div className="wm-rf"/><div className="wm-sp"><div className="wm-hb"/><div className="wm-bl wm-b0"/><div className="wm-bl wm-b1"/><div className="wm-bl wm-b2"/><div className="wm-bl wm-b3"/></div><div className="wm-bd"/>
         </div>
       </div>
     </>
