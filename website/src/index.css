@@ -3,9 +3,12 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body { overflow-x:hidden; width:100%; }
 
-/* Hide scrollbar but keep scrolling */
-::-webkit-scrollbar { width:0; height:0; }
-html { scrollbar-width:none; }
+/* Sleek thin scrollbar */
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(120,120,120,.25); border-radius:10px; }
+::-webkit-scrollbar-thumb:hover { background:rgba(120,120,120,.5); }
+html { scrollbar-width:thin; scrollbar-color:rgba(120,120,120,.25) transparent; }
 
 .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -25,6 +28,8 @@ html { scrollbar-width:none; }
 @keyframes pulse-glow { 0%,100% { opacity:.6; } 50% { opacity:1; } }
 @keyframes fade-up { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
 @keyframes spin-anim { 100% { transform: rotate(360deg); } }
+@keyframes scroll-bounce { 0%,100% { top:8px; opacity:1; } 50% { top:22px; opacity:.3; } }
+.scroll-indicator:hover { opacity:1 !important; }
 
 /* Universal Component Hover Effects — Static (no movement) */
 :root {

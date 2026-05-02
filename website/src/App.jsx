@@ -1,21 +1,14 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-gsap.registerPlugin(ScrollTrigger);
+import React from 'react';
 import { getLocations, predictAuto, predictManual } from "./api";
 import { getAqiTheme, getTimeInfo } from "./themes";
 import SearchSelect from "./SearchSelect";
-import { Shield, Wind, CloudRain, Thermometer, Droplets, ArrowRight, Sun, Moon, MapPin, Search, Activity, Leaf, Clock, Sparkles, Skull, AlertCircle, Pencil, Radio, Users, Heart, Eye, Cloud, CloudSun, Sunset, Sunrise } from 'lucide-react';
+import { Shield, Wind, CloudRain, Thermometer, Droplets, ArrowRight, Sun, Moon, MapPin, Search, Activity, Leaf, Clock, Sparkles, Skull, AlertCircle, Pencil, Radio, Users, Heart, Eye, Cloud, CloudSun, Sunset, Sunrise, Cpu, Database, BarChart3 } from 'lucide-react';
 import WindmillScene from './WindmillScene';
-import Lanyard from './Lanyard';
-import { districts as staticDistricts, locMap as staticLocMap } from "./locations";
-import React from 'react';
 
-class ErrorBoundary extends React.Component {
-  constructor(props) { super(props); this.state = { hasError: false, error: null }; }
-  static getDerivedStateFromError(error) { return { hasError: true, error }; }
-  render() { if (this.state.hasError) return <div style={{position:'absolute',top:200,left:'50%',transform:'translateX(-50%)',zIndex:999,background:'red',color:'white',padding:20}}>Error: {this.state.error?.message}</div>; return this.props.children; }
-}
+import { districts as staticDistricts, locMap as staticLocMap } from "./locations";
+
+
 
 
 const T_DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -111,32 +104,10 @@ export default function App(){
     :{bg:'#f9f9fc',card:'#ffffff',cb:'rgba(0,0,0,.04)',text:'#111827',sub:'#6b7280',mut:'#9ca3af',acc:'#0f172a',inp:'#f3f4f6',inpB:'rgba(0,0,0,.05)',div:'rgba(0,0,0,.06)'};
   const CS={background:T.card,border:`1px solid ${T.cb}`,borderRadius:24,boxShadow:D?'0 2px 16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.03)':'0 10px 30px rgba(0,0,0,.03), 0 1px 3px rgba(0,0,0,.02)'};
   const LB={fontSize:11,color:T.sub,letterSpacing:'.08em',textTransform:'uppercase',fontWeight:700,marginBottom:12};
-  const mainRef=useRef(null);
-
-  // GSAP scroll animations
-  useEffect(()=>{
-    const ctx=gsap.context(()=>{
-      // 1. Hero Text & Stats
-      gsap.from('.hero-word', { y: 80, opacity: 0, duration: 1, stagger: 0.15, ease: 'power4.out', delay: 0.1 });
-      gsap.from('.hero-sub', { y: 20, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.6 });
-
-      // 2. Dashboard Sections Stagger
-      gsap.utils.toArray('.gsap-stagger-section').forEach(section => {
-        gsap.from(section.querySelectorAll('.hover-lift, .hover-scale, .health-card'), {
-          y: 40, 
-          opacity: 0, 
-          duration: 0.8, 
-          stagger: 0.1, 
-          ease: 'power3.out',
-          scrollTrigger: { trigger: section, start: 'top 85%' }
-        });
-      });
-    },mainRef);
-    return()=>ctx.revert();
-  },[]);
+  // Removed GSAP to fix opacity bugs. Using native CSS animations instead.
 
   return(
-    <div ref={mainRef} style={{background:T.bg,minHeight:'100vh',fontFamily:"'Inter',sans-serif",color:T.text,'--bg':T.bg}}>
+    <div style={{background:T.bg,minHeight:'100vh',fontFamily:"'Inter',sans-serif",color:T.text,'--bg':T.bg}}>
 
       {/* ═══ HERO — Xurya style ═══ */}
       <div style={{padding:16,position:'relative',marginBottom:48}}>
@@ -144,30 +115,29 @@ export default function App(){
         <div className="hero-landscape" style={{position:'relative',height:'90vh',minHeight:600,borderRadius:24,overflow:'hidden',transform:'translateZ(0)',isolation:'isolate',WebkitMaskImage:'-webkit-radial-gradient(white, black)'}}>
           <WindmillScene isNight={D}/>
           {/* Dark overlay for text readability */}
-          <div style={{position:'absolute',inset:0,background:'radial-gradient(ellipse 80% 70% at 50% 45%, rgba(0,0,0,.55) 0%, rgba(0,0,0,.15) 60%, transparent 100%)',pointerEvents:'none'}}/>
+          <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,.45) 40%, rgba(0,0,0,.35) 70%, rgba(0,0,0,.5) 100%)',pointerEvents:'none'}}/>
 
           {/* Hero Content — Elegant & Minimal (Reference Image Style) */}
-          <div className="hero-text-block" style={{position:'absolute',top:'40%',left:'50%',transform:'translate(-50%,-50%)',zIndex:10,textAlign:'center',maxWidth:640}}>
-            <h1 className="hero-title" style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:56,fontWeight:500,color:'#111827',lineHeight:1.1,marginBottom:16,textShadow:'0 2px 16px rgba(255,255,255,.6)'}}>
-              <span className="hero-word" style={{display:'block'}}>Air Quality,</span>
-              <span className="hero-word" style={{display:'block'}}>One Step at a Time</span>
-            </h1>
-            <p className="hero-sub" style={{fontFamily:"'Inter', sans-serif",fontSize:15,fontWeight:500,color:'#374151',marginBottom:32,lineHeight:1.5,textShadow:'0 1px 12px rgba(255,255,255,.5)'}}>
-              Hyper-local ML predictions designed to ensure<br/>a healthier environment and inner peace.
-            </p>
+          <div className="hero-text-block" style={{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',zIndex:10,textAlign:'center',maxWidth:640}}>
+            <div style={{animation:'fade-up 1s ease-out forwards'}}>
+              <h1 className="hero-title" style={{fontFamily:"'Playfair Display', Georgia, serif",fontSize:56,fontWeight:500,color:'#ffffff',lineHeight:1.1,marginBottom:16,textShadow:'0 2px 24px rgba(0,0,0,.5), 0 1px 3px rgba(0,0,0,.4)'}}>
+                <span className="hero-word" style={{display:'block'}}>Air Quality,</span>
+                <span className="hero-word" style={{display:'block'}}>One Step at a Time</span>
+              </h1>
+              <p className="hero-sub" style={{fontFamily:"'Inter', sans-serif",fontSize:15,fontWeight:500,color:'rgba(255,255,255,.88)',marginBottom:32,lineHeight:1.5,textShadow:'0 1px 8px rgba(0,0,0,.4)'}}>
+                Hyper-local ML predictions designed to ensure<br/>a healthier environment and inner peace.
+              </p>
 
-            <div className="hero-sub hero-buttons" style={{display:'flex',gap:16,flexWrap:'wrap',justifyContent:'center'}}>
-              <button className="hover-scale" onClick={()=>document.getElementById('scan-section').scrollIntoView({behavior:'smooth'})} style={{padding:'12px 28px',borderRadius:8,border:'none',background:'#3b82f6',color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',display:'flex',alignItems:'center',gap:8,fontFamily:"'Inter'",boxShadow:'0 4px 12px rgba(59,130,246,.3)'}}>
-                <Sparkles size={16}/> Start now
-              </button>
-              <button className="hover-lift" onClick={()=>document.getElementById('features').scrollIntoView({behavior:'smooth'})} style={{padding:'12px 28px',borderRadius:8,border:'none',background:'rgba(255,255,255,.9)',backdropFilter:'blur(4px)',color:'#111827',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:"'Inter'",boxShadow:'0 4px 12px rgba(0,0,0,.05)'}}>
-                Our Features
-              </button>
+              <div className="hero-sub hero-buttons" style={{display:'flex',gap:16,flexWrap:'wrap',justifyContent:'center'}}>
+                <button className="hover-scale" onClick={()=>document.getElementById('scan-section').scrollIntoView({behavior:'smooth'})} style={{padding:'11px 26px',borderRadius:99,border:'none',background:'linear-gradient(135deg,#3b82f6,#2563eb)',color:'#fff',fontSize:13,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',gap:7,fontFamily:"'Inter'",boxShadow:'0 2px 12px rgba(37,99,235,.45)',letterSpacing:'.01em',transition:'all .3s ease'}}>
+                  <Sparkles size={14}/> Start Now
+                </button>
+                <button className="hover-scale" onClick={()=>document.getElementById('features').scrollIntoView({behavior:'smooth'})} style={{padding:'11px 26px',borderRadius:99,border:'1.5px solid rgba(255,255,255,.35)',background:'transparent',color:'rgba(255,255,255,.92)',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:"'Inter'",letterSpacing:'.01em',display:'flex',alignItems:'center',gap:7,transition:'all .3s ease'}}>
+                  <ArrowRight size={14}/> Our Features
+                </button>
+              </div>
             </div>
           </div>
-          
-          {/* Interactive 3D Lanyard Stats */}
-          <ErrorBoundary><Lanyard /></ErrorBoundary>
           
           {/* Nav on top of landscape */}
           <div className="hero-nav" style={{position:'absolute',top:0,left:0,right:0,zIndex:15,padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
@@ -184,13 +154,34 @@ export default function App(){
             </div>
           </div>
         </div>
+
+        {/* Floating Stats Bar — positioned to overlap hero bottom */}
+        <div className="stats-bar hero-sub" style={{display:'flex',alignItems:'center',gap:0,padding:'14px 36px',background:D?'rgba(17,17,16,.95)':'#fff',borderRadius:16,border:`1px solid ${D?'rgba(255,255,255,.08)':'rgba(0,0,0,.06)'}`,boxShadow:D?'0 8px 32px rgba(0,0,0,.4)':'0 8px 32px rgba(0,0,0,.08), 0 1px 3px rgba(0,0,0,.04)',margin:'-28px auto 0',position:'relative',zIndex:20,width:'fit-content',animation:'fade-up 1s ease-out 0.3s both'}}>
+          {[{v:'98.83%',l:'Accuracy',c:D?'#f0ece4':'#111827'},{v:'400+',l:'Locations',c:'#3b82f6'},{v:'9',l:'Districts',c:'#22c55e'}].map((s,i)=>(
+            <div key={s.l} style={{display:'flex',alignItems:'center',gap:0}}>
+              <div style={{textAlign:'center',padding:'0 20px'}}>
+                <div style={{fontSize:20,fontWeight:900,color:s.c,lineHeight:1,letterSpacing:'-0.02em'}}>{s.v}</div>
+                <div style={{fontSize:9,color:D?'#a09888':'#9ca3af',fontWeight:700,marginTop:4,letterSpacing:'.06em',textTransform:'uppercase'}}>{s.l}</div>
+              </div>
+              {i<2&&<div style={{width:1,height:28,background:D?'rgba(255,255,255,.08)':'rgba(0,0,0,.08)'}}/>}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ═══ SCROLL DOWN INDICATOR ═══ */}
+      <div className="scroll-indicator" onClick={()=>document.getElementById('scan-section').scrollIntoView({behavior:'smooth'})} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:8,padding:'12px 0 0',cursor:'pointer',opacity:.6,transition:'opacity .3s'}}>
+        <div style={{width:24,height:38,borderRadius:12,border:`2px solid ${T.sub}`,position:'relative',display:'flex',justifyContent:'center'}}>
+          <div className="scroll-dot" style={{width:4,height:4,borderRadius:'50%',background:T.sub,position:'absolute',top:8,animation:'scroll-bounce 2s ease-in-out infinite'}}/>
+        </div>
+        <span style={{fontSize:10,fontWeight:700,color:T.sub,letterSpacing:'.12em',textTransform:'uppercase'}}>Scroll to explore</span>
       </div>
 
       {/* ═══ DASHBOARD BELOW ═══ */}
       <div id="scan-section" className="scan-section" style={{padding:'60px 32px 0',maxWidth:'100%'}}>
 
         {/* ── 3-COLUMN LAYOUT: Scan | Pollutants | Gauge ── */}
-        <div className="gsap-stagger-section dashboard-grid" style={{display:'grid',gridTemplateColumns:'300px 1fr 320px',gap:16,marginBottom:20,position:'relative',zIndex:50}}>
+        <div className="dashboard-grid" style={{display:'grid',gridTemplateColumns:'300px 1fr 320px',gap:16,marginBottom:20,position:'relative',zIndex:50,animation:'fade-up 1s ease-out 0.4s both'}}>
 
           {/* COL 1: Scan Controls */}
           <div className="hover-lift" style={{...CS,padding:22,position:'relative',zIndex:20}}>
