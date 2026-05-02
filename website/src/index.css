@@ -70,7 +70,7 @@ html { scrollbar-width:none; }
     grid-template-columns: repeat(2, 1fr) !important;
   }
   .stats-bar {
-    min-width: 360px !important;
+    min-width: 320px !important;
     padding: 18px 24px !important;
     gap: 20px !important;
   }
@@ -81,21 +81,48 @@ html { scrollbar-width:none; }
   .dashboard-grid {
     grid-template-columns: 1fr !important;
   }
-  .hero-title {
-    font-size: 36px !important;
-  }
-  .hero-text-block {
-    bottom: 32px !important;
-    left: 24px !important;
-    max-width: 85% !important;
-  }
+
+  /* Hero landscape — shorter on mobile */
   .hero-landscape {
-    height: 60vh !important;
-    min-height: 380px !important;
+    height: 65vh !important;
+    min-height: 420px !important;
   }
-  .hero-gauge-float {
+
+  /* Hero text — reposition below nav with safe spacing */
+  .hero-text-block {
+    bottom: auto !important;
+    top: 72px !important;
+    left: 20px !important;
+    right: 20px !important;
+    max-width: 100% !important;
+  }
+  .hero-title {
+    font-size: 32px !important;
+    margin-bottom: 10px !important;
+  }
+  .hero-title h1 {
+    font-size: 32px !important;
+  }
+
+  /* Hero sub elements — smaller on mobile */
+  .hero-sub {
+    font-size: 13px !important;
+  }
+
+  /* Hide the windmill on mobile — it overlaps with text */
+  .wm-wrap {
     display: none !important;
   }
+
+  /* Sun/Moon orb — make smaller and push to corner */
+  .zen-orb {
+    width: 50px !important;
+    height: 50px !important;
+    right: 10% !important;
+    top: 8% !important;
+  }
+
+  /* Stats bar — flow below hero instead of floating */
   .stats-bar {
     position: relative !important;
     bottom: auto !important;
@@ -103,10 +130,16 @@ html { scrollbar-width:none; }
     left: 0 !important;
     min-width: auto !important;
     width: calc(100% - 32px) !important;
-    margin: -20px auto 0 !important;
+    margin: -24px auto 0 !important;
+    padding: 16px 20px !important;
+    gap: 16px !important;
   }
+
   .health-grid {
     grid-template-columns: 1fr !important;
+  }
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
   .tech-team-grid {
     grid-template-columns: 1fr !important;
@@ -114,6 +147,7 @@ html { scrollbar-width:none; }
   .scan-section {
     padding-left: 16px !important;
     padding-right: 16px !important;
+    padding-top: 40px !important;
   }
   .site-footer {
     flex-direction: column !important;
@@ -124,26 +158,33 @@ html { scrollbar-width:none; }
 
 /* ─── RESPONSIVE: Small phone (≤480px) ─────────────────────────────── */
 @media (max-width: 480px) {
+  .hero-landscape {
+    height: 55vh !important;
+    min-height: 360px !important;
+    border-radius: 16px !important;
+  }
+  .hero-text-block {
+    top: 64px !important;
+    left: 16px !important;
+    right: 16px !important;
+  }
+  .hero-title {
+    font-size: 26px !important;
+  }
+
   .features-grid {
     grid-template-columns: 1fr !important;
   }
-  .hero-title {
-    font-size: 28px !important;
-  }
-  .hero-landscape {
-    height: 50vh !important;
-    min-height: 280px !important;
-    border-radius: 16px !important;
-  }
+
   .stats-bar {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-    padding: 16px !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 8px !important;
+    padding: 14px 16px !important;
   }
-  .stats-bar > div {
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
-    text-align: left !important;
+  .stats-bar > div > div:first-child {
+    font-size: 20px !important;
+  }
+  .stats-bar > div > div:last-child {
+    font-size: 9px !important;
   }
 }

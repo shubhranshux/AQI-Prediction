@@ -146,18 +146,18 @@ export default function App(){
               <div style={{overflow:'hidden',paddingBottom:4}}><span className="hero-word" style={{display:'block',color:'#d4a574'}}>Redefined.</span></div>
             </h1>
             <p className="hero-sub" style={{fontSize:16,color:'rgba(255,255,255,.9)',lineHeight:1.6,fontWeight:500,marginBottom:36,textShadow:'0 2px 10px rgba(0,0,0,.2)'}}>Hyper-local predictions powered by XGBoost. Stay ahead of pollution with our AI-driven insights across Odisha.</p>
-            <div className="hero-sub" style={{display:'flex',gap:16}}>
-              <button className="hover-scale" onClick={()=>document.getElementById('scan-section').scrollIntoView({behavior:'smooth'})} style={{padding:'14px 32px',borderRadius:99,border:'none',background:'#fff',color:'#1a1510',fontSize:14,fontWeight:800,cursor:'pointer',display:'flex',alignItems:'center',gap:8,fontFamily:"'Inter'",boxShadow:'0 8px 24px rgba(255,255,255,.2)'}}>
-                <Search size={16}/>Scan Now
+            <div className="hero-sub hero-buttons" style={{display:'flex',gap:12,flexWrap:'wrap'}}>
+              <button className="hover-scale" onClick={()=>document.getElementById('scan-section').scrollIntoView({behavior:'smooth'})} style={{padding:'12px 24px',borderRadius:99,border:'none',background:'#fff',color:'#1a1510',fontSize:13,fontWeight:800,cursor:'pointer',display:'flex',alignItems:'center',gap:6,fontFamily:"'Inter'",boxShadow:'0 8px 24px rgba(255,255,255,.2)'}}>
+                <Search size={14}/>Scan Now
               </button>
-              <button className="hover-lift" onClick={()=>document.getElementById('features').scrollIntoView({behavior:'smooth'})} style={{padding:'14px 32px',borderRadius:99,border:'1px solid rgba(255,255,255,.4)',background:'rgba(255,255,255,.1)',color:'#fff',fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:"'Inter'",backdropFilter:'blur(8px)',boxShadow:'0 4px 16px rgba(0,0,0,.1)'}}>
+              <button className="hover-lift" onClick={()=>document.getElementById('features').scrollIntoView({behavior:'smooth'})} style={{padding:'12px 24px',borderRadius:99,border:'1px solid rgba(255,255,255,.4)',background:'rgba(255,255,255,.1)',color:'#fff',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:"'Inter'",backdropFilter:'blur(8px)',boxShadow:'0 4px 16px rgba(0,0,0,.1)'}}>
                 Our Features
               </button>
             </div>
           </div>
           
           {/* Nav on top of landscape */}
-          <div style={{position:'absolute',top:0,left:0,right:0,zIndex:15,padding:'20px 32px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <div className="hero-nav" style={{position:'absolute',top:0,left:0,right:0,zIndex:15,padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
             <div style={{display:'flex',alignItems:'center',gap:8}}>
               <div style={{width:32,height:32,borderRadius:8,background:'rgba(255,255,255,.15)',backdropFilter:'blur(8px)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 12px rgba(0,0,0,.2)'}}><Leaf size={15} color="#fff"/></div>
               <span style={{fontSize:15,fontWeight:800,color:'#fff',textShadow:'0 2px 8px rgba(0,0,0,.4)'}}>EnviroPredict</span>
