@@ -66,10 +66,11 @@ def predict_manual(req: ManualPredictionRequest):
 def predict_auto(req: AutoPredictionRequest):
     """Predict AQI by automatically fetching live data for the location."""
     lat, lon = LocationService.geocode(req.location, req.district)
-    params = WeatherService.fetch(lat, lon)
+    # Fetch parameters and apply regional ML calibration based on district
+    params = WeatherService.fetch(lat, lon, req.district)
     result = PredictionService.predict(req.location, req.district, params)
     result["coordinates"] = {"lat": lat, "lon": lon}
-    result["data_source"] = "LIVE (Open-Meteo API)"
+    result["data_source"] = "LIVE (ML-Calibrated Open-Meteo)"
     return result
 
 

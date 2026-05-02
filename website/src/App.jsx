@@ -75,6 +75,13 @@ export default function App(){
   const [mode,setMode]=useState('auto'); // auto|manual
   const [manual,setManual]=useState({pm25:'',pm10:'',no2:'',so2:'',co:'',o3:'',temp:'',humidity:''});
   const [bars,setBars]=useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Auto-updating clock
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(()=>{if(district&&locMap[district])setLocation(locMap[district][0])},[district]);
   useEffect(()=>{setResult(null);setBars(false)},[district,location]);
@@ -122,17 +129,24 @@ export default function App(){
           {/* Dark overlay for text readability */}
           <div style={{position:'absolute',inset:0,background:'linear-gradient(to right, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 50%, transparent 100%)',pointerEvents:'none'}}/>
 
-          {/* Hero Content Overlay */}
-          <div className="hero-text-block" style={{position:'absolute',bottom:80,left:60,zIndex:10,maxWidth:500}}>
-            <div className="hero-sub" style={{display:'inline-flex',alignItems:'center',gap:6,background:'rgba(255,255,255,.15)',backdropFilter:'blur(10px)',padding:'6px 14px',borderRadius:99,color:'#fff',fontSize:13,fontWeight:700,letterSpacing:'.08em',marginBottom:20}}>
-              <Sparkles size={14}/> LIVE INTELLIGENCE
+          {/* Hero Content Overlay (Premium Styling) */}
+          <div className="hero-text-block" style={{position:'absolute',bottom:80,left:60,zIndex:10,maxWidth:540}}>
+            <div className="hero-sub" style={{display:'inline-flex',alignItems:'center',gap:8,background:'rgba(255,255,255,.1)',backdropFilter:'blur(12px)',padding:'6px 16px',borderRadius:99,color:'#fff',fontSize:12,fontWeight:700,letterSpacing:'.08em',marginBottom:24,border:'1px solid rgba(255,255,255,.15)',boxShadow:'0 4px 12px rgba(0,0,0,.1)'}}>
+              <Sparkles size={14} color="#fbbf24"/> LIVE ML PREDICTION
             </div>
-            <h1 className="hero-title" style={{fontSize:56,fontWeight:900,color:'#fff',lineHeight:1.05,letterSpacing:'-0.03em',marginBottom:16}}>
+            <h1 className="hero-title" style={{fontSize:62,fontWeight:900,color:'#fff',lineHeight:1.05,letterSpacing:'-0.03em',marginBottom:18,textShadow:'0 4px 24px rgba(0,0,0,.4)'}}>
               <div style={{overflow:'hidden',paddingBottom:4}}><span className="hero-word" style={{display:'block'}}>Air Quality.</span></div>
               <div style={{overflow:'hidden',paddingBottom:4}}><span className="hero-word" style={{display:'block',color:'#d4a574'}}>Redefined.</span></div>
             </h1>
-            <p className="hero-sub" style={{fontSize:16,color:'rgba(255,255,255,.8)',lineHeight:1.6,fontWeight:400,marginBottom:32}}>Hyper-local predictions powered by XGBoost. Stay ahead of pollution with our AI-driven insights.</p>
-            <button className="hero-sub hover-scale" onClick={()=>document.getElementById('scan-section').scrollIntoView({behavior:'smooth'})} style={{background:'#d4a574',color:'#000',border:'none',padding:'14px 28px',borderRadius:12,fontSize:14,fontWeight:800,cursor:'pointer',boxShadow:'0 8px 24px rgba(212,165,116,.3)'}}>Start Scanning</button>
+            <p className="hero-sub" style={{fontSize:16,color:'rgba(255,255,255,.9)',lineHeight:1.6,fontWeight:500,marginBottom:36,textShadow:'0 2px 10px rgba(0,0,0,.2)'}}>Hyper-local predictions powered by XGBoost. Stay ahead of pollution with our AI-driven insights across Odisha.</p>
+            <div className="hero-sub" style={{display:'flex',gap:16}}>
+              <button className="hover-scale" onClick={()=>document.getElementById('scan-section').scrollIntoView({behavior:'smooth'})} style={{padding:'14px 32px',borderRadius:99,border:'none',background:'#fff',color:'#1a1510',fontSize:14,fontWeight:800,cursor:'pointer',display:'flex',alignItems:'center',gap:8,fontFamily:"'Inter'",boxShadow:'0 8px 24px rgba(255,255,255,.2)'}}>
+                <Search size={16}/>Scan Now
+              </button>
+              <button className="hover-lift" onClick={()=>document.getElementById('features').scrollIntoView({behavior:'smooth'})} style={{padding:'14px 32px',borderRadius:99,border:'1px solid rgba(255,255,255,.4)',background:'rgba(255,255,255,.1)',color:'#fff',fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:"'Inter'",backdropFilter:'blur(8px)',boxShadow:'0 4px 16px rgba(0,0,0,.1)'}}>
+                Our Features
+              </button>
+            </div>
           </div>
           
           {/* Nav on top of landscape */}
@@ -142,27 +156,13 @@ export default function App(){
               <span style={{fontSize:15,fontWeight:800,color:'#fff',textShadow:'0 2px 8px rgba(0,0,0,.4)'}}>EnviroPredict</span>
             </div>
             <div style={{display:'flex',alignItems:'center',gap:12}}>
-              <span style={{fontSize:12,color:'rgba(255,255,255,.9)',display:'flex',alignItems:'center',gap:4,textShadow:'0 2px 8px rgba(0,0,0,.4)',fontWeight:600}}><Clock size={12}/>{new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
+              <span style={{fontSize:12,color:'rgba(255,255,255,.9)',display:'flex',alignItems:'center',gap:4,textShadow:'0 2px 8px rgba(0,0,0,.4)',fontWeight:600}}><Clock size={12}/>{currentTime.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
               <button onClick={()=>setDark(!D)} style={{width:34,height:20,borderRadius:10,border:'1px solid rgba(255,255,255,.2)',background:'rgba(255,255,255,.1)',cursor:'pointer',position:'relative',padding:0,backdropFilter:'blur(4px)',boxShadow:'0 2px 8px rgba(0,0,0,.3)'}}>
                 <div style={{width:14,height:14,borderRadius:7,background:D?'#fbbf24':'#fff',position:'absolute',top:2,left:D?17:2,transition:'all .3s',boxShadow:'0 1px 2px rgba(0,0,0,.2)'}}/>
               </button>
             </div>
           </div>
 
-          {/* Big text — bottom left */}
-          <div className="hero-text-block" style={{position:'absolute',bottom:56,left:48,zIndex:10,maxWidth:540}}>
-            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:12}}>
-              <TI.I size={16} color="#fff" style={{filter:'drop-shadow(0 2px 4px rgba(0,0,0,.4))'}}/>
-              <span style={{fontSize:13,color:'#fff',fontWeight:600,letterSpacing:'.02em',textShadow:'0 2px 8px rgba(0,0,0,.5)'}}>{time.greeting} · Real-time AQI Prediction</span>
-            </div>
-            <div className="hero-title" style={{fontSize:54,fontWeight:900,color:'#fff',lineHeight:1.08,letterSpacing:'-0.025em',textShadow:'0 2px 20px rgba(0,0,0,.3)'}}>
-              Clean Air<br/>for Odisha<span style={{color:'#d4a574'}}>.</span>
-            </div>
-            <div style={{display:'flex',gap:14,marginTop:24}}>
-              <button onClick={()=>document.getElementById('scan-section')?.scrollIntoView({behavior:'smooth'})} style={{padding:'11px 26px',borderRadius:99,border:'none',background:'#fff',color:'#1a1510',fontSize:13,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',gap:6,fontFamily:"'Inter'",boxShadow:'0 4px 16px rgba(0,0,0,.15)'}}><Search size={14}/>Scan Now</button>
-              <button onClick={()=>document.getElementById('features')?.scrollIntoView({behavior:'smooth'})} style={{padding:'11px 26px',borderRadius:99,border:'1px solid rgba(255,255,255,.3)',background:'rgba(255,255,255,.08)',color:'#fff',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:"'Inter'",backdropFilter:'blur(4px)'}}>Our Features</button>
-            </div>
-          </div>
         </div>
 
         {/* Stats bar — bottom right, overlapping */}
@@ -259,7 +259,7 @@ export default function App(){
         </div>
 
         {/* Health Tips */}
-        {aqi!==null&&<div className="health-grid gsap-stagger-section" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:14,marginBottom:20}}>
+        {aqi!==null&&<div className="health-grid gsap-stagger-section" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:14,marginBottom:20,position:'relative',zIndex:40}}>
           {[{I:Activity,t:'Outdoor Activity',tip:aqi<100?'Great for sports & jogging.':'Limit prolonged outdoor exertion.',c:'#22c55e'},{I:Shield,t:'Protection',tip:aqi<100?'No mask needed today.':'N95 mask recommended outdoors.',c:'#3b82f6'},{I:Wind,t:'Ventilation',tip:aqi<100?'Open windows for fresh air.':'Keep windows closed. Use purifiers.',c:'#eab308'}].map(h=>(
             <div key={h.t} className="hover-lift health-card" style={{...CS,padding:20,display:'flex',alignItems:'center',gap:14}}>
               <div style={{width:40,height:40,borderRadius:12,background:`${h.c}0A`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><h.I size={18} color={h.c}/></div>
@@ -269,7 +269,7 @@ export default function App(){
         </div>}
 
         {/* Features */}
-        <div id="features" className="gsap-stagger-section" style={{marginTop:32,marginBottom:20}}>
+        <div id="features" className="gsap-stagger-section" style={{marginTop:32,marginBottom:20,position:'relative',zIndex:30}}>
           <div style={{textAlign:'center',marginBottom:24}}><div style={LB}>Why EnviroPredict</div><h2 style={{fontSize:30,fontWeight:900,margin:'4px 0'}}>Built for Precision</h2></div>
           <div className="features-grid" style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:14}}>
             {[{I:Cpu,t:'ML Powered',d:'XGBoost with 98.83% accuracy.',c:'#d4a574'},{I:Database,t:'Live Data',d:'Real-time from Open-Meteo API.',c:'#3b82f6'},{I:BarChart3,t:'6 Pollutants',d:'Complete pollutant analysis.',c:'#22c55e'},{I:Sparkles,t:'Smart UI',d:'Landscape reacts to AQI.',c:'#a855f7'}].map(f=>(
