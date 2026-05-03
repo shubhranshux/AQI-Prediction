@@ -155,6 +155,11 @@ export default function HeroBackground({ isNight = false }) {
 
         /* MOUNTAINS */
         .h-mts{position:absolute;bottom:0;left:0;right:0;z-index:8;pointer-events:none}
+        .mt-back { animation: mountain-pan-back 90s ease-in-out infinite, mountain-breathe 25s ease-in-out infinite; transform-origin: bottom center; }
+        .mt-mid { animation: mountain-pan-mid 70s ease-in-out infinite, mountain-breathe 20s ease-in-out infinite; transform-origin: bottom center; }
+        @keyframes mountain-pan-back { 0% { transform: translateX(0px) scale(1.02); } 50% { transform: translateX(-2%) scale(1.02); } 100% { transform: translateX(0px) scale(1.02); } }
+        @keyframes mountain-pan-mid { 0% { transform: translateX(0px) scale(1.05); } 50% { transform: translateX(-3.5%) scale(1.05); } 100% { transform: translateX(0px) scale(1.05); } }
+        @keyframes mountain-breathe { 0% { transform: scaleY(1); } 50% { transform: scaleY(1.015); } 100% { transform: scaleY(1); } }
 
         /* RIVER SHIMMER */
         @keyframes rv-flow{0%{stroke-dashoffset:0}100%{stroke-dashoffset:-80}}
@@ -245,39 +250,21 @@ export default function HeroBackground({ isNight = false }) {
           </defs>
 
 
-          {/* Layer 1: Far distant peaks — dramatic jagged silhouette */}
-          <path d="M0 230 L20 218 L38 225 L52 198 L68 210 L85 188 L100 196 L118 170 L132 180 L148 158 L165 172 L180 148 L198 162 L220 120 L232 142 L248 100 L260 118 L278 130 L295 108 L310 125 L328 98 L342 115 L358 88 L375 78 L388 92 L405 110 L420 95 L440 118 L458 105 L475 115 L495 98 L510 108 L530 90 L548 102 L568 85 L580 95 L600 72 L618 88 L635 65 L648 78 L665 90 L680 75 L700 88 L718 72 L738 82 L755 68 L770 80 L790 62 L808 75 L825 88 L845 72 L860 85 L880 98 L898 82 L915 65 L928 55 L940 68 L958 80 L978 65 L995 78 L1015 62 L1030 72 L1048 58 L1065 68 L1085 75 L1100 62 L1118 72 L1135 85 L1155 70 L1170 80 L1190 65 L1205 55 L1218 60 L1232 72 L1250 62 L1268 75 L1285 85 L1305 72 L1320 82 L1338 92 L1355 80 L1375 88 L1392 98 L1410 85 L1428 95 L1445 108 L1465 95 L1480 105 L1500 92 L1520 102 L1538 112 L1555 100 L1575 118 L1590 128 L1600 135 L1600 400 L0 400Z" fill="url(#mg1)"/>
-          {/* Snow caps on tallest peaks — larger, more realistic */}
-          {[[248,100,14],[375,78,16],[635,65,18],[790,62,15],[928,55,20],[1205,55,17]].map(([x,y,s],i)=>(
-            <g key={`snow${i}`}>
-              <polygon points={`${x-s*.7},${y+s*.4} ${x-s*.15},${y} ${x+s*.15},${y-2} ${x+s*.6},${y+s*.35}`} fill={C.snow}/>
-              <polygon points={`${x-s*.4},${y+s*.25} ${x},${y+1} ${x+s*.35},${y+s*.2}`} fill={C.snow} opacity=".5"/>
-            </g>
-          ))}
-          {/* Ridge shadow lines on far peaks */}
-          <path d="M248 100 L260 140 L270 165" fill="none" stroke={N?'rgba(0,0,0,.15)':'rgba(0,0,0,.08)'} strokeWidth="1.5"/>
-          <path d="M375 78 L385 110 L392 145" fill="none" stroke={N?'rgba(0,0,0,.15)':'rgba(0,0,0,.08)'} strokeWidth="1.5"/>
-          <path d="M635 65 L648 100 L655 135" fill="none" stroke={N?'rgba(0,0,0,.15)':'rgba(0,0,0,.08)'} strokeWidth="1.5"/>
-          <path d="M928 55 L940 95 L948 130" fill="none" stroke={N?'rgba(0,0,0,.15)':'rgba(0,0,0,.08)'} strokeWidth="1.5"/>
-          <path d="M1205 55 L1218 90 L1225 125" fill="none" stroke={N?'rgba(0,0,0,.15)':'rgba(0,0,0,.08)'} strokeWidth="1.5"/>
-          {/* Rock face shadows — darker side of major peaks */}
-          <path d="M248 100 L260 118 L265 155 L248 170 L235 142 Z" fill={N?'rgba(0,0,0,.12)':'rgba(0,0,0,.06)'}/>
-          <path d="M635 65 L650 85 L655 125 L640 140 L625 110 Z" fill={N?'rgba(0,0,0,.12)':'rgba(0,0,0,.06)'}/>
-          <path d="M928 55 L945 75 L950 118 L935 132 L918 98 Z" fill={N?'rgba(0,0,0,.12)':'rgba(0,0,0,.06)'}/>
+          {/* Layer 1: Majestic Back Mountains (Animated) */}
+          <g className="mt-back">
+            <path d="M-50 250 L80 120 L160 190 L280 50 L380 160 L500 80 L620 180 L750 40 L880 150 L1000 60 L1150 200 L1300 70 L1450 160 L1650 90 L1650 400 L-50 400Z" fill="url(#mg1)"/>
+            <path d="M80 120 L110 160 L160 190 L120 220 Z M280 50 L310 100 L380 160 L320 190 Z M500 80 L540 130 L620 180 L560 210 Z M750 40 L800 90 L880 150 L820 190 Z M1000 60 L1060 120 L1150 200 L1080 230 Z M1300 70 L1360 110 L1450 160 L1380 190 Z" fill={N ? 'rgba(0,0,0,.25)' : 'rgba(0,0,0,.15)'}/>
+            <path d="M80 120 L60 140 L75 145 L85 135 L95 150 L110 135 Z M280 50 L250 85 L265 95 L285 80 L300 105 L320 85 Z M500 80 L470 115 L485 125 L505 105 L525 135 L545 110 Z M750 40 L710 85 L730 95 L755 75 L780 110 L805 85 Z M1000 60 L960 105 L980 115 L1005 90 L1035 130 L1065 100 Z M1300 70 L1260 115 L1280 125 L1305 100 L1335 140 L1360 110 Z" fill={C.snow}/>
+          </g>
 
           {/* Atmospheric haze between layers */}
           <rect x="0" y="190" width="1600" height="50" fill={N?'rgba(10,20,40,.08)':'rgba(180,210,230,.1)'} />
 
-          {/* Layer 2: Mid mountains — rugged ridgeline */}
-          <path d="M0 258 L25 248 L48 255 L72 235 L90 242 L112 222 L128 232 L150 215 L168 225 L188 208 L205 218 L225 200 L238 210 L255 195 L275 205 L295 192 L312 202 L335 188 L350 198 L372 210 L390 198 L412 208 L430 195 L452 205 L470 192 L490 202 L510 188 L528 198 L550 208 L568 195 L588 205 L608 192 L628 200 L648 188 L665 198 L685 210 L705 198 L722 205 L742 195 L760 202 L782 190 L800 198 L818 210 L838 198 L858 205 L878 195 L898 202 L920 192 L938 200 L958 210 L978 198 L998 205 L1018 195 L1038 202 L1058 192 L1078 200 L1098 210 L1118 198 L1138 205 L1158 195 L1178 202 L1198 210 L1218 200 L1238 208 L1258 198 L1278 205 L1298 212 L1318 202 L1338 210 L1358 218 L1378 208 L1398 215 L1418 222 L1438 212 L1458 218 L1478 225 L1500 215 L1520 222 L1540 228 L1560 220 L1580 228 L1600 232 L1600 400 L0 400Z" fill="url(#mg2)"/>
-          {/* Ridge texture lines on mid mountains */}
-          {[[112,222,35],[335,188,40],[510,188,38],[782,190,36],[1058,192,34]].map(([x,y,h],i)=>(
-            <g key={`ridge${i}`} opacity=".12">
-              <line x1={x} y1={y} x2={x+8} y2={y+h} stroke={N?'#fff':'#000'} strokeWidth="1"/>
-              <line x1={x+5} y1={y+2} x2={x+15} y2={y+h-5} stroke={N?'#fff':'#000'} strokeWidth=".7"/>
-              <line x1={x-4} y1={y+4} x2={x+2} y2={y+h+2} stroke={N?'#fff':'#000'} strokeWidth=".5"/>
-            </g>
-          ))}
+          {/* Layer 2: Rugged Mid Mountains (Animated at different speed for parallax) */}
+          <g className="mt-mid">
+            <path d="M-50 280 L40 210 L120 250 L200 170 L280 230 L360 180 L440 240 L520 160 L600 230 L680 190 L760 250 L840 180 L920 240 L1000 170 L1080 230 L1160 190 L1240 250 L1320 180 L1400 240 L1480 190 L1560 250 L1650 200 L1650 400 L-50 400Z" fill="url(#mg2)"/>
+            <path d="M40 210 L60 235 L120 250 L90 260 Z M200 170 L230 205 L280 230 L240 245 Z M360 180 L390 210 L440 240 L400 255 Z M520 160 L550 195 L600 230 L560 245 Z M680 190 L710 220 L760 250 L720 265 Z M840 180 L870 215 L920 240 L880 255 Z M1000 170 L1030 205 L1080 230 L1040 245 Z M1160 190 L1190 220 L1240 250 L1200 265 Z M1320 180 L1350 215 L1400 240 L1360 255 Z" fill={N ? 'rgba(0,0,0,.2)' : 'rgba(0,0,0,.1)'}/>
+          </g>
 
           {/* Pine trees on ridge — varied sizes and density */}
           {Array.from({length:55},(_,i)=>{const x=i*30+Math.random()*15;const h=8+Math.random()*18;const y=250-Math.random()*8;

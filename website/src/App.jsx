@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import React from 'react';
 import { getLocations, predictAuto, predictManual } from "./api";
 import { getAqiTheme, getTimeInfo } from "./themes";
@@ -18,7 +18,7 @@ const getLevel=a=>LEVELS.find(l=>a<=l.max)||LEVELS[5];
 const TIME={'Good Morning':{I:Sunrise,s:"Fresh air awaits you"},'Good Afternoon':{I:CloudSun,s:"Stay mindful of the air"},'Good Evening':{I:Sunset,s:"Wind down, breathe easy"},'Good Night':{I:Moon,s:"Rest well tonight"}};
 const FIELDS=[{k:'pm25',l:'PM2.5',u:'µg/m³'},{k:'pm10',l:'PM10',u:'µg/m³'},{k:'no2',l:'NO₂',u:'ppb'},{k:'so2',l:'SO₂',u:'ppb'},{k:'co',l:'CO',u:'mg/m³'},{k:'o3',l:'O₃',u:'ppb'},{k:'temp',l:'Temp',u:'°C'},{k:'humidity',l:'Humidity',u:'%'}];
 
-function Gauge({aqi,color,dark}){
+const Gauge = React.memo(function Gauge({aqi,color,dark}){
   const cx=120,cy=120,r=96,strk=28,p=Math.min(aqi/500,1);
   const T = dark ? { cut:'#111110', ndl:'#f8fafc', ndlHole:'#111110', txt:'rgba(255,255,255,.5)' } : { cut:'#ffffff', ndl:'#334155', ndlHole:'#ffffff', txt:'rgba(0,0,0,.5)' };
   return(
@@ -63,7 +63,7 @@ function Gauge({aqi,color,dark}){
       </g>
     </svg>
   );
-}
+});
 
 // Isolated Clock to prevent full-app re-renders every second
 function ClockDisplay() {
@@ -96,20 +96,17 @@ export default function App(){
 
   useEffect(()=>{if(district&&locMap[district])setLocation(locMap[district][0])},[district]);
   useEffect(()=>{setResult(null);setBars(false)},[district,location]);
-  const scan=async()=>{setLoading(true);setError(null);setBars(false);try{let r;if(mode==='auto')r=await predictAuto(district,location);else{const n={};for(const k in manual)n[k]=parseFloat(manual[k])||0;r=await predictManual({...n,district,location})}setResult(r);setTimeout(()=>setBars(true),400)}catch{setError('Prediction failed')}setLoading(false)};
+  const scan=useCallback(async()=>{setLoading(true);setError(null);setBars(false);try{let r;if(mode==='auto')r=await predictAuto(district,location);else{const n={};for(const k in manual)n[k]=parseFloat(manual[k])||0;r=await predictManual({...n,district,location})}setResult(r);setTimeout(()=>setBars(true),400)}catch{setError('Prediction failed')}setLoading(false)}, [mode, district, location, manual]);
 
   const aqi=result?.predicted_aqi??null;const lv=aqi!==null?getLevel(aqi):null;const LI=lv?.I||Shield;
   const theme=getAqiTheme(aqi);const p=result?.parameters;
-  const T=D?{bg:'#000000',card:'#111110',cb:'rgba(255,255,255,.08)',text:'#f0ece4',sub:'#a09888',mut:'#6c665d',acc:'#d4a574',inp:'#1a1a18',inpB:'rgba(255,255,255,.10)',div:'rgba(255,255,255,.06)'}
-    :{bg:'#f9f9fc',card:'#ffffff',cb:'rgba(0,0,0,.04)',text:'#111827',sub:'#6b7280',mut:'#9ca3af',acc:'#0f172a',inp:'#f3f4f6',inpB:'rgba(0,0,0,.05)',div:'rgba(0,0,0,.06)'};
-  const CS={background:T.card,border:`1px solid ${T.cb}`,borderRadius:24,boxShadow:D?'0 2px 16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.03)':'0 10px 30px rgba(0,0,0,.03), 0 1px 3px rgba(0,0,0,.02)'};
-  const LB={fontSize:11,color:T.sub,letterSpacing:'.08em',textTransform:'uppercase',fontWeight:700,marginBottom:12};
+  const T=useMemo(()=>D?{bg:'#000000',card:'#111110',cb:'rgba(255,255,255,.08)',text:'#f0ece4',sub:'#a09888',mut:'#6c665d',acc:'#d4a574',inp:'#1a1a18',inpB:'rgba(255,255,255,.10)',div:'rgba(255,255,255,.06)'}
+    :{bg:'#f9f9fc',card:'#ffffff',cb:'rgba(0,0,0,.04)',text:'#111827',sub:'#6b7280',mut:'#9ca3af',acc:'#0f172a',inp:'#f3f4f6',inpB:'rgba(0,0,0,.05)',div:'rgba(0,0,0,.06)'},[D]);
+  const CS=useMemo(()=>({background:T.card,border:`1px solid ${T.cb}`,borderRadius:24,boxShadow:D?'0 2px 16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.03)':'0 10px 30px rgba(0,0,0,.03), 0 1px 3px rgba(0,0,0,.02)'}),[T,D]);
+  const LB=useMemo(()=>({fontSize:11,color:T.sub,letterSpacing:'.08em',textTransform:'uppercase',fontWeight:700,marginBottom:12}),[T]);
   // Removed GSAP to fix opacity bugs. Using native CSS animations instead.
 
-  return(
-    <div style={{background:T.bg,minHeight:'100vh',fontFamily:"'Inter',sans-serif",color:T.text,'--bg':T.bg}}>
-
-      {/* ═══ HERO — Xurya style ═══ */}
+  const heroMemo = useMemo(() => (
       <div style={{padding:16,position:'relative',marginBottom:48}}>
         {/* Landscape container — full width, rounded */}
         <div className="hero-landscape" style={{position:'relative',height:'90vh',minHeight:600,borderRadius:24,overflow:'hidden',transform:'translateZ(0)',isolation:'isolate',WebkitMaskImage:'-webkit-radial-gradient(white, black)'}}>
@@ -168,6 +165,13 @@ export default function App(){
           ))}
         </div>
       </div>
+  ), [D, T]);
+
+  return(
+    <div style={{background:T.bg,minHeight:'100vh',fontFamily:"'Inter',sans-serif",color:T.text,'--bg':T.bg}}>
+
+      {/* ═══ HERO — Xurya style ═══ */}
+      {heroMemo}
 
       {/* ═══ SCROLL DOWN INDICATOR ═══ */}
       <div className="scroll-indicator" onClick={()=>document.getElementById('scan-section').scrollIntoView({behavior:'smooth'})} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:8,padding:'12px 0 0',cursor:'pointer',opacity:.6,transition:'opacity .3s'}}>
@@ -272,6 +276,8 @@ export default function App(){
         </div>}
 
         {/* Features */}
+        {useMemo(() => (
+        <>
         <div id="features" className="gsap-stagger-section" style={{marginTop:32,marginBottom:20,position:'relative',zIndex:30}}>
           <div style={{textAlign:'center',marginBottom:24}}><div style={LB}>Why EnviroPredict</div><h2 style={{fontSize:30,fontWeight:900,margin:'4px 0'}}>Built for Precision</h2><p style={{fontSize:14,color:T.sub,maxWidth:480,margin:'8px auto 0'}}>Combining cutting-edge ML models with live environmental data for the most accurate AQI predictions in Odisha.</p></div>
           <div className="features-grid" style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:14}}>
@@ -327,6 +333,8 @@ export default function App(){
           <p style={{fontSize:12,color:T.mut}}>AQI Prediction System · XGBoost + FastAPI + React</p>
           <p style={{fontSize:11,color:T.mut,display:'flex',alignItems:'center',gap:4}}><Heart size={10} color="#ef4444"/>Built with care in Odisha</p>
         </footer>
+        </>
+        ), [T, D, CS, LB])}
       </div>
     </div>
   );
