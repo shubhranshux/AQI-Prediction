@@ -16,7 +16,7 @@ const T_DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Sat
 const LEVELS=[{max:50,label:"Good",color:"#22c55e",I:Leaf},{max:100,label:"Satisfactory",color:"#eab308",I:Sun},{max:200,label:"Moderate",color:"#f97316",I:Cloud},{max:300,label:"Poor",color:"#ef4444",I:CloudRain},{max:400,label:"Very Poor",color:"#a855f7",I:Skull},{max:500,label:"Severe",color:"#dc2626",I:AlertCircle}];
 const getLevel=a=>LEVELS.find(l=>a<=l.max)||LEVELS[5];
 const TIME={'Good Morning':{I:Sunrise,s:"Fresh air awaits you"},'Good Afternoon':{I:CloudSun,s:"Stay mindful of the air"},'Good Evening':{I:Sunset,s:"Wind down, breathe easy"},'Good Night':{I:Moon,s:"Rest well tonight"}};
-const FIELDS=[{k:'pm25',l:'PM2.5',u:'µg/m³'},{k:'pm10',l:'PM10',u:'µg/m³'},{k:'no2',l:'NO₂',u:'ppb'},{k:'so2',l:'SO₂',u:'ppb'},{k:'co',l:'CO',u:'mg/m³'},{k:'o3',l:'O₃',u:'ppb'},{k:'temp',l:'Temp',u:'°C'},{k:'humidity',l:'Humidity',u:'%'}];
+const FIELDS=[{k:'pm25',l:'PM2.5',u:'µg/m³'},{k:'pm10',l:'PM10',u:'µg/m³'},{k:'no2',l:'NO₂',u:'µg/m³'},{k:'so2',l:'SO₂',u:'µg/m³'},{k:'co',l:'CO',u:'mg/m³'},{k:'o3',l:'O₃',u:'µg/m³'},{k:'temp',l:'Temp',u:'°C'},{k:'humidity',l:'Humidity',u:'%'}];
 
 const Gauge = React.memo(function Gauge({aqi,color,dark}){
   const cx=120,cy=120,r=96,strk=28,p=Math.min(aqi/500,1);

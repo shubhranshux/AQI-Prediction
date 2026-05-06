@@ -9,10 +9,10 @@ class ManualPredictionRequest(BaseModel):
     location: str = Field(..., description="Location name within the district")
     pm25: float = Field(..., ge=0, description="PM2.5 concentration (ug/m3)")
     pm10: float = Field(..., ge=0, description="PM10 concentration (ug/m3)")
-    no2: float = Field(..., ge=0, description="NO2 concentration (ppb)")
-    so2: float = Field(..., ge=0, description="SO2 concentration (ppb)")
+    no2: float = Field(..., ge=0, description="NO2 concentration (ug/m3)")
+    so2: float = Field(..., ge=0, description="SO2 concentration (ug/m3)")
     co: float = Field(..., ge=0, description="CO concentration (mg/m3)")
-    o3: float = Field(..., ge=0, description="O3 concentration (ppb)")
+    o3: float = Field(..., ge=0, description="O3 concentration (ug/m3)")
     temp: float = Field(..., description="Temperature (Celsius)")
     humidity: float = Field(..., ge=0, le=100, description="Relative humidity (%)")
 
@@ -39,6 +39,7 @@ class PredictionResponse(BaseModel):
     """Response body for AQI prediction results."""
     predicted_aqi: int
     real_time_aqi: Optional[int] = None
+    ml_raw_aqi: Optional[int] = None
     category: str
     emoji: str
     rt_category: Optional[str] = None

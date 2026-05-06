@@ -7,33 +7,38 @@ from src.predict import load_model, get_aqi_category
 
 def calculate_indian_aqi(params: dict) -> int:
     """Calculate AQI using official Indian CPCB sub-index breakpoint method.
-    
+
     Uses the National Air Quality Index (NAQI) breakpoint concentrations.
     The highest sub-index among all pollutants becomes the overall AQI.
+
+    IMPORTANT: All pollutant values must be in µg/m³ (PM2.5, PM10, NO2, SO2,
+    O3) or mg/m³ (CO) — matching the CPCB breakpoint tables directly.
+    No ppb→µg/m³ conversion is needed because the pipeline already keeps
+    everything in µg/m³.
     """
     # CPCB Breakpoint tables: (Conc_lo, Conc_hi, AQI_lo, AQI_hi)
     breakpoints = {
-        'pm25': [  # PM2.5 (ug/m3) - 24hr avg
+        'pm25': [  # PM2.5 (µg/m³) - 24hr avg
             (0, 30, 0, 50), (31, 60, 51, 100), (61, 90, 101, 200),
             (91, 120, 201, 300), (121, 250, 301, 400), (251, 500, 401, 500),
         ],
-        'pm10': [  # PM10 (ug/m3) - 24hr avg
+        'pm10': [  # PM10 (µg/m³) - 24hr avg
             (0, 50, 0, 50), (51, 100, 51, 100), (101, 250, 101, 200),
             (251, 350, 201, 300), (351, 430, 301, 400), (431, 600, 401, 500),
         ],
-        'no2': [  # NO2 (ug/m3) - 24hr avg
+        'no2': [  # NO2 (µg/m³) - 24hr avg
             (0, 40, 0, 50), (41, 80, 51, 100), (81, 180, 101, 200),
             (181, 280, 201, 300), (281, 400, 301, 400), (401, 600, 401, 500),
         ],
-        'so2': [  # SO2 (ug/m3) - 24hr avg
+        'so2': [  # SO2 (µg/m³) - 24hr avg
             (0, 40, 0, 50), (41, 80, 51, 100), (81, 380, 101, 200),
             (381, 800, 201, 300), (801, 1600, 301, 400), (1601, 2400, 401, 500),
         ],
-        'co': [  # CO (mg/m3) - 8hr avg
+        'co': [  # CO (mg/m³) - 8hr avg
             (0, 1, 0, 50), (1.1, 2, 51, 100), (2.1, 10, 101, 200),
             (10.1, 17, 201, 300), (17.1, 34, 301, 400), (34.1, 50, 401, 500),
         ],
-        'o3': [  # O3 (ug/m3) - 8hr avg
+        'o3': [  # O3 (µg/m³) - 8hr avg
             (0, 50, 0, 50), (51, 100, 51, 100), (101, 168, 101, 200),
             (169, 208, 201, 300), (209, 748, 301, 400), (749, 1000, 401, 500),
         ],
@@ -48,18 +53,14 @@ def calculate_indian_aqi(params: dict) -> int:
                 return round(((a_hi - a_lo) / (c_hi - c_lo)) * (conc - c_lo) + a_lo)
         return 500  # Beyond highest breakpoint
 
-    # Convert ppb values back to ug/m3 for CPCB formula
-    no2_ugm3 = params.get('no2', 0) * 46.01 / 24.45 if params.get('no2', 0) else 0
-    so2_ugm3 = params.get('so2', 0) * 64.06 / 24.45 if params.get('so2', 0) else 0
-    o3_ugm3 = params.get('o3', 0) * 48.0 / 24.45 if params.get('o3', 0) else 0
-
+    # All values are already in µg/m³ (or mg/m³ for CO) — no conversion needed
     sub_indices = [
         sub_index(params.get('pm25', 0), breakpoints['pm25']),
         sub_index(params.get('pm10', 0), breakpoints['pm10']),
-        sub_index(no2_ugm3, breakpoints['no2']),
-        sub_index(so2_ugm3, breakpoints['so2']),
-        sub_index(params.get('co', 0), breakpoints['co']),
-        sub_index(o3_ugm3, breakpoints['o3']),
+        sub_index(params.get('no2', 0),  breakpoints['no2']),
+        sub_index(params.get('so2', 0),  breakpoints['so2']),
+        sub_index(params.get('co', 0),   breakpoints['co']),
+        sub_index(params.get('o3', 0),   breakpoints['o3']),
     ]
 
     return max(sub_indices) if sub_indices else 0
@@ -81,17 +82,28 @@ class PredictionService:
 
     @classmethod
     def predict(cls, location: str, district: str, params: dict) -> dict:
-        """Run AQI prediction with the given parameters."""
+        """Run AQI prediction with the given parameters.
+
+        Returns a hybrid AQI that blends the ML model's prediction with the
+        CPCB formula-based calculation.  This significantly reduces per-region
+        variance because:
+          • The ML model captures location/temporal patterns
+          • The CPCB formula provides a physics-grounded baseline
+        """
         now = datetime.now()
 
         try:
             if location in cls.le.classes_:
                 loc_encoded = cls.le.transform([location])[0]
             else:
-                # Fallback to a known location for the model encoder
-                fallback_map = {'Kalahandi': 'Bhawanipatna', 'Dhenkanal': 'Dhenkanal', 'Khordha': 'Bhubaneswar'}
-                loc_encoded = cls.le.transform([fallback_map.get(district, cls.le.classes_[0])])[0]
-                
+                # Fallback: pick a known location in the same district
+                district_locs = [l for l in cls.le.classes_
+                                 if l in _DISTRICT_FALLBACK.get(district, [])]
+                if district_locs:
+                    loc_encoded = cls.le.transform([district_locs[0]])[0]
+                else:
+                    loc_encoded = cls.le.transform([cls.le.classes_[0]])[0]
+
             dist_encoded = cls.le_district.transform([district])[0]
         except Exception:
             raise HTTPException(
@@ -106,16 +118,35 @@ class PredictionService:
             loc_encoded, dist_encoded
         ]], columns=cls.feature_cols)
 
-        predicted_aqi = max(0, round(float(cls.model.predict(features)[0])))
-        category, emoji = get_aqi_category(predicted_aqi)
+        ml_aqi = max(0, round(float(cls.model.predict(features)[0])))
 
-        # Calculate real-time AQI using official Indian CPCB formula
-        real_time_aqi = calculate_indian_aqi(params)
-        rt_category, rt_emoji = get_aqi_category(real_time_aqi)
+        # Calculate formula-based AQI using official CPCB breakpoints
+        formula_aqi = calculate_indian_aqi(params)
+
+        # ── Hybrid blend ─────────────────────────────────────────────────
+        # Use a smooth, continuous weighting that transitions from ML-
+        # dominated (low divergence) to formula-dominated (high divergence).
+        # The CPCB formula is the official standard, so we always anchor
+        # toward it — the ML model adds location/temporal nuance.
+        divergence = abs(ml_aqi - formula_aqi)
+        if divergence <= 3:
+            # Near-perfect agreement — trust ML fully
+            predicted_aqi = ml_aqi
+        else:
+            # Smoothly increase formula weight as divergence grows.
+            # At divergence=10 → ~55% formula; at divergence=20 → ~75% formula
+            formula_weight = min(0.85, 0.40 + divergence * 0.025)
+            ml_weight = 1.0 - formula_weight
+            predicted_aqi = round(ml_weight * ml_aqi + formula_weight * formula_aqi)
+
+        predicted_aqi = max(0, predicted_aqi)
+        category, emoji = get_aqi_category(predicted_aqi)
+        rt_category, rt_emoji = get_aqi_category(formula_aqi)
 
         return {
             "predicted_aqi": predicted_aqi,
-            "real_time_aqi": real_time_aqi,
+            "real_time_aqi": formula_aqi,
+            "ml_raw_aqi": ml_aqi,
             "category": category,
             "emoji": emoji,
             "rt_category": rt_category,
@@ -123,3 +154,17 @@ class PredictionService:
             "location": location,
             "district": district,
         }
+
+
+# Quick lookup for district → known training locations (for encoder fallback)
+_DISTRICT_FALLBACK = {
+    'Kalahandi':  ['Bhawanipatna', 'Kesinga', 'Dharmagarh', 'Junagarh', 'Lanjigarh'],
+    'Dhenkanal':  ['Dhenkanal', 'Kamakhyanagar', 'Hindol', 'Bhuban', 'Gondia'],
+    'Keonjhar':   ['Keonjhar', 'Barbil', 'Joda', 'Champua', 'Anandapur'],
+    'Khordha':    ['Bhubaneswar', 'Jatni', 'Khordha', 'Mancheswar', 'Khandagiri'],
+    'Jajpur':     ['Jajpur', 'Jajpur Road', 'Vyasanagar', 'Sukinda', 'Danagadi'],
+    'Cuttack':    ['Cuttack', 'Choudwar', 'Banki', 'Athagarh', 'Salepur'],
+    'Sundargarh': ['Rourkela'],
+    'Ganjam':     ['Berhampur'],
+    'Sambalpur':  ['Sambalpur'],
+}

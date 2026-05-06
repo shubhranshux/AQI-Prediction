@@ -561,9 +561,30 @@ def generate_random_params(district):
     return params
 
 
+
+# Per-district, per-pollutant calibration factors to correct satellite
+# underestimation.  Must stay in sync with services/weather_service.py.
+_CLI_CALIBRATION = {
+    'Kalahandi':  {'pm25': 1.35, 'pm10': 1.40, 'no2': 1.30, 'so2': 1.25, 'co': 1.20, 'o3': 1.15},
+    'Dhenkanal':  {'pm25': 1.50, 'pm10': 1.55, 'no2': 1.45, 'so2': 1.40, 'co': 1.35, 'o3': 1.20},
+    'Keonjhar':   {'pm25': 2.00, 'pm10': 2.10, 'no2': 1.60, 'so2': 1.30, 'co': 1.25, 'o3': 1.15},
+    'Khordha':    {'pm25': 1.80, 'pm10': 1.75, 'no2': 1.55, 'so2': 1.50, 'co': 1.45, 'o3': 1.25},
+    'Jajpur':     {'pm25': 1.70, 'pm10': 1.65, 'no2': 1.45, 'so2': 1.35, 'co': 1.40, 'o3': 1.20},
+    'Cuttack':    {'pm25': 1.85, 'pm10': 1.80, 'no2': 1.50, 'so2': 1.40, 'co': 1.35, 'o3': 1.20},
+    'Sundargarh': {'pm25': 1.90, 'pm10': 1.85, 'no2': 1.55, 'so2': 1.45, 'co': 1.40, 'o3': 1.25},
+    'Ganjam':     {'pm25': 1.60, 'pm10': 1.55, 'no2': 1.50, 'so2': 1.30, 'co': 1.35, 'o3': 1.15},
+    'Sambalpur':  {'pm25': 1.75, 'pm10': 1.70, 'no2': 1.45, 'so2': 1.35, 'co': 1.30, 'o3': 1.20},
+}
+_CLI_DEFAULT_CAL = {'pm25': 1.50, 'pm10': 1.50, 'no2': 1.40, 'so2': 1.30, 'co': 1.30, 'o3': 1.15}
+
+
 def fetch_live_params(location, district):
     """Fetch live air quality and weather data from Open-Meteo API.
-    Returns a dict of parameters or None if fetching fails."""
+    Returns a dict of parameters or None if fetching fails.
+
+    All pollutant values are returned in µg/m³ (NO2, SO2, O3, PM2.5, PM10)
+    or mg/m³ (CO) to match the units the model was trained on.
+    """
     if not HAS_REQUESTS or not HAS_GEOPY:
         return None
 
@@ -592,26 +613,24 @@ def fetch_live_params(location, district):
         aq = aq_res["current"]
         w = weather_res["current"]
 
-        pm25 = aq.get("pm2_5", 0) or 0
-        pm10 = aq.get("pm10", 0) or 0
-        co_ug = aq.get("carbon_monoxide", 0) or 0
-        no2_ug = aq.get("nitrogen_dioxide", 0) or 0
-        so2_ug = aq.get("sulphur_dioxide", 0) or 0
-        o3_ug = aq.get("ozone", 0) or 0
+        # Raw values from API — all in µg/m³ except CO
+        pm25_raw = aq.get("pm2_5", 0) or 0
+        pm10_raw = aq.get("pm10", 0) or 0
+        co_raw   = (aq.get("carbon_monoxide", 0) or 0) / 1000.0  # µg/m³ → mg/m³
+        no2_raw  = aq.get("nitrogen_dioxide", 0) or 0             # µg/m³ (keep!)
+        so2_raw  = aq.get("sulphur_dioxide", 0) or 0              # µg/m³ (keep!)
+        o3_raw   = aq.get("ozone", 0) or 0                        # µg/m³ (keep!)
 
-        # Unit conversions (ug/m3 to model units)
-        co = co_ug / 1000.0        # mg/m3
-        no2 = (no2_ug * 24.45 / 46.01) if no2_ug else 0.0  # ppb
-        so2 = (so2_ug * 24.45 / 64.06) if so2_ug else 0.0  # ppb
-        o3 = (o3_ug * 24.45 / 48.00) if o3_ug else 0.0     # ppb
+        # Apply per-district calibration
+        cal = _CLI_CALIBRATION.get(district, _CLI_DEFAULT_CAL)
 
         return {
-            'pm25': round(pm25, 2),
-            'pm10': round(pm10, 2),
-            'no2': round(no2, 2),
-            'so2': round(so2, 2),
-            'co': round(co, 2),
-            'o3': round(o3, 2),
+            'pm25': round(pm25_raw * cal['pm25'], 2),
+            'pm10': round(pm10_raw * cal['pm10'], 2),
+            'no2':  round(no2_raw  * cal['no2'],  2),
+            'so2':  round(so2_raw  * cal['so2'],  2),
+            'co':   round(co_raw   * cal['co'],   2),
+            'o3':   round(o3_raw   * cal['o3'],   2),
             'temp': w.get("temperature_2m", 25.0),
             'humidity': w.get("relative_humidity_2m", 50.0),
             'coordinates': {'lat': lat, 'lon': lon}
@@ -745,10 +764,10 @@ def interactive_prediction(model, le, le_district, feature_cols):
                 print("\n  Parameters used:")
                 print(f"    PM2.5 : {params['pm25']} ug/m3")
                 print(f"    PM10  : {params['pm10']} ug/m3")
-                print(f"    NO2   : {params['no2']} ppb")
-                print(f"    SO2   : {params['so2']} ppb")
+                print(f"    NO2   : {params['no2']} ug/m3")
+                print(f"    SO2   : {params['so2']} ug/m3")
                 print(f"    CO    : {params['co']} mg/m3")
-                print(f"    O3    : {params['o3']} ppb")
+                print(f"    O3    : {params['o3']} ug/m3")
                 print(f"    Temp  : {params['temp']} C")
                 print(f"    Humid : {params['humidity']} %")
                 print(f"  Source: {data_source}")
@@ -770,10 +789,10 @@ def interactive_prediction(model, le, le_district, feature_cols):
                 print("  |")
                 pm25 = float(input("  |  PM2.5 (ug/m3)   : "))
                 pm10 = float(input("  |  PM10  (ug/m3)   : "))
-                no2  = float(input("  |  NO2   (ppb)     : "))
-                so2  = float(input("  |  SO2   (ppb)     : "))
+                no2  = float(input("  |  NO2   (ug/m3)   : "))
+                so2  = float(input("  |  SO2   (ug/m3)   : "))
                 co   = float(input("  |  CO    (mg/m3)   : "))
-                o3   = float(input("  |  O3    (ppb)     : "))
+                o3   = float(input("  |  O3    (ug/m3)   : "))
                 temp = float(input("  |  Temperature (C) : "))
                 hum  = float(input("  |  Humidity (%)    : "))
                 month = int(input("  |  Month (1-12)    : "))
