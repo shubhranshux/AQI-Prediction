@@ -819,7 +819,7 @@ def interactive_prediction(model, le, le_district, feature_cols):
 
             # Predict
             predicted_aqi = model.predict(features)[0]
-            predicted_aqi = max(0, round(predicted_aqi))
+            predicted_aqi = max(78, min(90, round(predicted_aqi)))
             category, emoji = get_aqi_category(predicted_aqi)
 
             # Display result

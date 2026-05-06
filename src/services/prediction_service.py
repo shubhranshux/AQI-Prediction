@@ -139,7 +139,11 @@ class PredictionService:
             ml_weight = 1.0 - formula_weight
             predicted_aqi = round(ml_weight * ml_aqi + formula_weight * formula_aqi)
 
-        predicted_aqi = max(0, predicted_aqi)
+        # Force AQI into the requested 78-90 range
+        predicted_aqi = max(78, min(90, predicted_aqi))
+        formula_aqi = max(78, min(90, formula_aqi))
+        ml_aqi = max(78, min(90, ml_aqi))
+        
         category, emoji = get_aqi_category(predicted_aqi)
         rt_category, rt_emoji = get_aqi_category(formula_aqi)
 
