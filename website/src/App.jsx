@@ -290,30 +290,11 @@ export default function App(){
           </div>
         </div>
 
-        {/* Tech + Team */}
-        <div className="gsap-stagger-section tech-team-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:20}}>
-          <div className="hover-lift" style={{...CS,padding:24}}>
-            <div style={LB}>Tech Stack</div>
-            <div className="tech-stack-inner-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-              {[
-                {n:'XGBoost',d:'ML Engine',c:'#d4a574'},{n:'FastAPI',d:'REST Backend',c:'#059669'},
-                {n:'React',d:'Frontend UI',c:'#61dafb'},{n:'Vite',d:'Build Tool',c:'#a855f7'},
-                {n:'scikit-learn',d:'Data Pipeline',c:'#f97316'},{n:'Open-Meteo',d:'Live AQ Data',c:'#3b82f6'},
-                {n:'Tailwind',d:'CSS Framework',c:'#38bdf8'},{n:'Lucide',d:'Icon System',c:'#6b7280'}
-              ].map(t=>(
-                <div key={t.n} className="hover-scale" style={{background:D?'#1a1a18':T.inp,borderRadius:14,padding:'12px 14px',display:'flex',alignItems:'center',gap:10,border:`1px solid ${T.cb}`}}>
-                  <div style={{width:8,height:8,borderRadius:'50%',background:t.c,flexShrink:0,boxShadow:`0 0 8px ${t.c}66`}}/>
-                  <div>
-                    <div style={{fontSize:13,fontWeight:700}}>{t.n}</div>
-                    <div style={{fontSize:10,color:T.sub,fontWeight:500}}>{t.d}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+        {/* Team */}
+        <div className="gsap-stagger-section" style={{marginBottom:20}}>
           <div className="hover-lift" style={{...CS,padding:24}}>
             <div style={LB}>Team</div>
-            <div className="team-inner-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+            <div className="team-inner-grid" style={{display:'grid',gridTemplateColumns:'repeat(4, 1fr)',gap:14}}>
               {[{n:'Shubhranshu Behera',r:'ML & Backend',c:'#d4a574'},{n:'Rupak Ranjan Parida',r:'Data Analysis',c:'#3b82f6'},{n:'Ranjan Kumar Nayak',r:'Research',c:'#22c55e'},{n:'Pramod Kumar Mohananta',r:'Frontend',c:'#a855f7'}].map(m=>(
                 <div key={m.n} className="hover-scale" style={{background:D?'#1a1a18':T.inp,borderRadius:14,padding:16,textAlign:'center',border:`1px solid ${T.cb}`}}>
                   <div style={{width:44,height:44,borderRadius:'50%',background:`linear-gradient(135deg, ${m.c}, ${m.c}88)`,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 10px',boxShadow:`0 4px 12px ${m.c}33`}}><Users size={18} color="#fff"/></div>
