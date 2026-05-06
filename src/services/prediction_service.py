@@ -168,7 +168,5 @@ _DISTRICT_FALLBACK = {
     'Khordha':    ['Bhubaneswar', 'Jatni', 'Khordha', 'Mancheswar', 'Khandagiri'],
     'Jajpur':     ['Jajpur', 'Jajpur Road', 'Vyasanagar', 'Sukinda', 'Danagadi'],
     'Cuttack':    ['Cuttack', 'Choudwar', 'Banki', 'Athagarh', 'Salepur'],
-    'Sundargarh': ['Rourkela'],
     'Ganjam':     ['Berhampur'],
-    'Sambalpur':  ['Sambalpur'],
 }

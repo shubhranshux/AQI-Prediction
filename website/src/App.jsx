@@ -154,7 +154,7 @@ export default function App(){
 
         {/* Floating Stats Bar — positioned to overlap hero bottom */}
         <div className="stats-bar hero-sub" style={{display:'flex',alignItems:'center',gap:0,padding:'14px 36px',background:D?'rgba(17,17,16,.95)':'#fff',borderRadius:16,border:`1px solid ${D?'rgba(255,255,255,.08)':'rgba(0,0,0,.06)'}`,boxShadow:D?'0 8px 32px rgba(0,0,0,.4)':'0 8px 32px rgba(0,0,0,.08), 0 1px 3px rgba(0,0,0,.04)',margin:'-28px auto 0',position:'relative',zIndex:20,width:'fit-content',animation:'fade-up 1s ease-out 0.3s both'}}>
-          {[{v:'98.83%',l:'Accuracy',c:D?'#f0ece4':'#111827'},{v:'400+',l:'Locations',c:'#3b82f6'},{v:'9',l:'Districts',c:'#22c55e'}].map((s,i)=>(
+          {[{v:'98.83%',l:'Accuracy',c:D?'#f0ece4':'#111827'},{v:'400+',l:'Locations',c:'#3b82f6'},{v:'7',l:'Districts',c:'#22c55e'}].map((s,i)=>(
             <div key={s.l} style={{display:'flex',alignItems:'center',gap:0}}>
               <div style={{textAlign:'center',padding:'0 20px'}}>
                 <div style={{fontSize:20,fontWeight:900,color:s.c,lineHeight:1,letterSpacing:'-0.02em'}}>{s.v}</div>

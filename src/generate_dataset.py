@@ -400,8 +400,6 @@ LOCATIONS = {
     'Kalyanpur':        {'district': 'Jajpur',      'type': 'rural',      'pollution_factor': 0.46, 'weight': 1},
     # ── Other Major Odisha Cities ────────────────────────────────
     'Cuttack':          {'district': 'Cuttack',     'type': 'urban',      'pollution_factor': 1.15, 'weight': 1},
-    'Rourkela':         {'district': 'Sundargarh',  'type': 'industrial', 'pollution_factor': 1.5,  'weight': 1},
-    'Sambalpur':        {'district': 'Sambalpur',   'type': 'urban',      'pollution_factor': 1.05, 'weight': 1},
     'Berhampur':        {'district': 'Ganjam',      'type': 'urban',      'pollution_factor': 1.0,  'weight': 1},
 }
 
