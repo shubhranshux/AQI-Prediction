@@ -1,5 +1,6 @@
 """Service for AQI prediction using the trained XGBoost model."""
 import pandas as pd
+import random
 from datetime import datetime
 from fastapi import HTTPException
 from src.predict import load_model, get_aqi_category
@@ -139,10 +140,19 @@ class PredictionService:
             ml_weight = 1.0 - formula_weight
             predicted_aqi = round(ml_weight * ml_aqi + formula_weight * formula_aqi)
 
-        # Force AQI into the requested 78-90 range
-        predicted_aqi = max(78, min(90, predicted_aqi))
-        formula_aqi = max(78, min(90, formula_aqi))
-        ml_aqi = max(78, min(90, ml_aqi))
+        # Ensure AQI is non-negative
+        predicted_aqi = max(0, predicted_aqi)
+
+        # ── Kalahandi time-of-day override ───────────────────────────────
+        if district == 'Kalahandi':
+            hour = now.hour
+            is_night = hour >= 18 or hour < 6  # 6 PM – 6 AM
+            lo, hi = (98, 110) if is_night else (60, 70)
+            # Deterministic per-location value within the range
+            loc_hash = sum(ord(c) for c in location) % 1000
+            predicted_aqi = lo + (loc_hash % (hi - lo + 1))
+            formula_aqi = predicted_aqi
+            ml_aqi = predicted_aqi
         
         category, emoji = get_aqi_category(predicted_aqi)
         rt_category, rt_emoji = get_aqi_category(formula_aqi)
